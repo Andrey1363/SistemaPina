@@ -1,0 +1,235 @@
+﻿/* =============================================
+   ESTILOS GLOBALES
+   ============================================= */
+body {
+    background-color: #f0f7e6;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* =============================================
+   LOGIN
+   ============================================= */
+
+/* Centra todo en la pantalla */
+.login-contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Caja del formulario */
+.login-box {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 380px;
+    text-align: center;
+}
+
+/* Título */
+.login-box h1 {
+    color: #2e7d32;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+/* Subtítulo */
+.login-box p {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+/* Ícono de piña */
+.icono {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+/* Grupo de cada campo */
+.campo {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+/* Etiquetas */
+.campo label {
+    display: block;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+/* Cajas de texto */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* Efecto al hacer clic */
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #2e7d32;
+}
+
+/* Botón ingresar */
+.btn-ingresar {
+    width: 100%;
+    padding: 12px;
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Efecto hover del botón */
+.btn-ingresar:hover {
+    background-color: #1b5e20;
+}
+
+/* Mensaje de error */
+.mensaje-error {
+    color: #c62828;
+    font-size: 13px;
+    margin-top: 12px;
+    display: block;
+}
+
+
+/* =============================================
+   DASHBOARD
+   ============================================= */
+
+/* Barra superior */
+.topbar {
+    background-color: #2e7d32;
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+/* Título de la barra superior */
+.topbar-titulo {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Sección derecha con usuario y botón */
+.topbar-usuario {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+}
+
+/* Botón cerrar sesión */
+.btn-cerrar {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* Hover del botón cerrar sesión */
+.btn-cerrar:hover {
+    background-color: #b71c1c;
+}
+
+/* Contenedor principal debajo del topbar */
+.contenedor-principal {
+    display: flex;
+    margin-top: 50px;
+    min-height: calc(100vh - 50px);
+}
+
+/* Menú lateral */
+.menu-lateral {
+    width: 220px;
+    background-color: #1b5e20;
+    padding: 20px 0;
+    min-height: 100%;
+    position: fixed;
+    top: 50px;
+    left: 0;
+}
+
+/* Lista del menú */
+.menu-lateral ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Items del menú */
+.menu-lateral ul li a {
+    display: block;
+    padding: 12px 24px;
+    color: #c8e6c9;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+/* Hover de los items */
+.menu-lateral ul li a:hover {
+    background-color: #2e7d32;
+    color: white;
+}
+
+/* Área de contenido principal */
+.contenido {
+    margin-left: 220px;
+    padding: 30px;
+    flex: 1;
+    background-color: #f0f7e6;
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+/* Título del contenido */
+.contenido h2 {
+    color: #2e7d32;
+    margin-bottom: 8px;
+}
+
+/* Subtítulo */
+.contenido p {
+    color: #777;
+    margin-bottom: 24px;
+}
+
+/* Contenedor de tarjetas */
+.tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Tarjeta individual */
+.ta
