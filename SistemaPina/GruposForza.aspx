@@ -1,11 +1,11 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Fincas.aspx.cs" Inherits="SistemaPina.Fincas" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="GruposForza.aspx.cs" Inherits="SistemaPina.GruposForza" %>
 
 <!DOCTYPE html>
 <html lang="es">
 <head runat="server">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fincas - Sistema de Gestión de Piña</title>
+    <title>Grupos de Forza - Sistema de Gestión de Piña</title>
     <link rel="stylesheet" href="Estilos.less" />
 </head>
 <body>
@@ -30,8 +30,8 @@
                     <li><a href="Lotes.aspx"> Lotes</a></li>
                     <li><a href="Bloques.aspx"> Bloques</a></li>
                     <li><a href="Siembras.aspx"> Siembras</a></li>
-                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
                     <li><a href="GruposForza.aspx"> Grupos de Forza</a></li>
+                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
                     <li><a href="Plagas.aspx"> Plagas</a></li>
                     <li><a href="Enfermedades.aspx"> Enfermedades</a></li>
                     <li><a href="Fertilizaciones.aspx"> Fertilizaciones</a></li>
@@ -45,44 +45,44 @@
 
             <!-- Contenido principal -->
             <div class="contenido">
-                <h2> Gestión de Fincas</h2>
-                <p>Registrá, consultá y administrá las fincas del sistema.</p>
+                <h2> Grupos de Forza</h2>
+                <p>Creá grupos de forza y asignales los bloques correspondientes.</p>
 
-                <!-- Formulario para agregar finca -->
+                <!-- Formulario para crear grupo -->
                 <div class="formulario-box">
-                    <h3>Agregar nueva finca</h3>
+                    <h3>Crear nuevo grupo de forza</h3>
 
                     <div class="campo-form">
-                        <label>Nombre de la finca</label>
-                        <asp:TextBox ID="txtNombre" runat="server" placeholder="Ej: Finca La Esperanza"></asp:TextBox>
+                        <label>Finca</label>
+                        <asp:DropDownList ID="ddlFinca" runat="server" CssClass="ddl" AutoPostBack="true" OnSelectedIndexChanged="ddlFinca_SelectedIndexChanged"></asp:DropDownList>
                     </div>
 
                     <div class="campo-form">
-                        <label>Ubicación</label>
-                        <asp:TextBox ID="txtUbicacion" runat="server" placeholder="Ej: San Carlos, Alajuela"></asp:TextBox>
+                        <label>Nombre del grupo</label>
+                        <asp:TextBox ID="txtNombre" runat="server" placeholder="Ej: GF1-2026"></asp:TextBox>
                     </div>
 
                     <div class="campo-form">
-                        <label>Área total (hectáreas)</label>
-                        <asp:TextBox ID="txtArea" runat="server" placeholder="Ej: 25.5"></asp:TextBox>
+                        <label>Bloques que pertenecen a este grupo</label>
+                        <!-- CheckBoxList permite seleccionar varios bloques a la vez -->
+                        <asp:CheckBoxList ID="cblBloques" runat="server" CssClass="check-list"></asp:CheckBoxList>
                     </div>
 
-                    <!-- Mensaje de error o éxito -->
                     <asp:Label ID="lblMensaje" runat="server" Text="" Visible="false"></asp:Label>
 
-                    <asp:Button ID="btnGuardar" runat="server" Text="Guardar finca" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
+                    <asp:Button ID="btnGuardar" runat="server" Text="Guardar grupo" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
                 </div>
 
-                <!-- Tabla de fincas registradas -->
+                <!-- Tabla de grupos registrados -->
                 <div class="tabla-box">
-                    <h3>Fincas registradas</h3>
-                    <asp:GridView ID="gvFincas" runat="server" CssClass="tabla" AutoGenerateColumns="false"
-                        OnRowCommand="gvFincas_RowCommand" DataKeyNames="FincaId">
+                    <h3>Grupos de Forza registrados</h3>
+                    <asp:GridView ID="gvGrupos" runat="server" CssClass="tabla" AutoGenerateColumns="false"
+                        OnRowCommand="gvGrupos_RowCommand" DataKeyNames="GrupoForzaId">
                         <Columns>
-                            <asp:BoundField DataField="FincaId" HeaderText="ID" />
-                            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
-                            <asp:BoundField DataField="Ubicacion" HeaderText="Ubicación" />
-                            <asp:BoundField DataField="AreaTotal" HeaderText="Área (ha)" />
+                            <asp:BoundField DataField="GrupoForzaId" HeaderText="ID" />
+                            <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
+                            <asp:BoundField DataField="Nombre" HeaderText="Grupo" />
+                            <asp:BoundField DataField="Bloques" HeaderText="Bloques" />
                             <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
                         </Columns>
                     </asp:GridView>

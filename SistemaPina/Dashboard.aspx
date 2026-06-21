@@ -27,19 +27,19 @@
             <!-- Menú lateral izquierdo -->
             <div class="menu-lateral">
                 <ul>
-                    <li><a href="Fincas.aspx">🏡 Fincas</a></li>
-                    <li><a href="Lotes.aspx">🗺️ Lotes</a></li>
-                    <li><a href="Bloques.aspx">📦 Bloques</a></li>
-                    <li><a href="Siembras.aspx">🌱 Siembras</a></li>
-                    <li><a href="Cosechas.aspx">🍍 Cosechas</a></li>
-                    <li><a href="Plagas.aspx">🐛 Plagas</a></li>
-                    <li><a href="Enfermedades.aspx">🦠 Enfermedades</a></li>
-                    <li><a href="Fertilizaciones.aspx">🧪 Fertilizaciones</a></li>
-                    <li><a href="Labores.aspx">👷 Labores</a></li>
-                    <li><a href="Reportes.aspx">📊 Reportes</a></li>
+                    <li><a href="Fincas.aspx"> Fincas</a></li>
+                    <li><a href="Lotes.aspx"> Lotes</a></li>
+                    <li><a href="Bloques.aspx"> Bloques</a></li>
+                    <li><a href="Siembras.aspx"> Siembras</a></li>
+                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
+                    <li><a href="Plagas.aspx"> Plagas</a></li>
+                    <li><a href="Enfermedades.aspx"> Enfermedades</a></li>
+                    <li><a href="Fertilizaciones.aspx"> Fertilizaciones</a></li>
+                    <li><a href="Labores.aspx"> Labores</a></li>
+                    <li><a href="Reportes.aspx"> Reportes</a></li>
                     <!-- Solo visible para Admin -->
                     <asp:Panel ID="panelUsuarios" runat="server">
-                        <li><a href="Usuarios.aspx">👤 Usuarios</a></li>
+                        <li><a href="Usuarios.aspx"> Usuarios</a></li>
                     </asp:Panel>
                 </ul>
             </div>
@@ -50,28 +50,24 @@
                 <p>Seleccioná una opción del menú para comenzar.</p>
 
                 <!-- Tarjetas de resumen -->
-                <div class="tarjetas">
-                    <div class="tarjeta">
-                        <h3>🏡 Fincas</h3>
-                        <asp:Label ID="lblTotalFincas" runat="server" Text="0"></asp:Label>
-                        <p>registradas</p>
-                    </div>
-                    <div class="tarjeta">
-                        <h3>🌱 Siembras</h3>
-                        <asp:Label ID="lblTotalSiembras" runat="server" Text="0"></asp:Label>
-                        <p>activas</p>
-                    </div>
-                    <div class="tarjeta">
-                        <h3>🐛 Plagas</h3>
-                        <asp:Label ID="lblTotalPlagas" runat="server" Text="0"></asp:Label>
-                        <p>reportadas</p>
-                    </div>
-                    <div class="tarjeta">
-                        <h3>🧪 Fertilizaciones</h3>
-                        <asp:Label ID="lblTotalFertilizaciones" runat="server" Text="0"></asp:Label>
-                        <p>aplicadas</p>
-                    </div>
-                </div>
+               <div class="tarjetas">
+    <div class="tarjeta">
+        <h3> Fincas</h3>
+        <asp:Label ID="lblTotalFincas" runat="server" Text="0"></asp:Label>
+        <p>registradas</p>
+    </div>
+    
+    <div class="tarjeta">
+        <h3> Grupos de Forza</h3>
+        <asp:Label ID="lblTotalPlagas" runat="server" Text="0"></asp:Label>
+        <p>registrados</p>
+    </div>
+    <div class="tarjeta">
+        <h3> Cosechas</h3>
+        <asp:Label ID="lblTotalFertilizaciones" runat="server" Text="0"></asp:Label>
+        <p>realizadas</p>
+    </div>
+</div>
             </div>
 
         </div>

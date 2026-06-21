@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Bloques.aspx" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -175,13 +176,17 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="Cosechas.aspx" />
     <Content Include="Dashboard.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="Enfermedades.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Fincas.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="GruposForza.aspx" />
     <Content Include="Login.aspx" />
     <Content Include="Lotes.aspx" />
+    <Content Include="Plagas.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -238,6 +243,7 @@
     <Content Include="Scripts\WebForms\WebForms.js" />
     <Content Include="Scripts\WebForms\WebParts.js" />
     <Content Include="Scripts\WebForms\WebUIValidation.js" />
+    <Content Include="Siembras.aspx" />
     <Content Include="Site.Master" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
@@ -254,6 +260,13 @@
       <DependentUpon>About.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Bloques.aspx.cs">
+      <DependentUpon>Bloques.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Bloques.aspx.designer.cs">
+      <DependentUpon>Bloques.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Clases\Conexion.cs" />
     <Compile Include="Contact.aspx.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
@@ -261,6 +274,13 @@
     </Compile>
     <Compile Include="Contact.aspx.designer.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Cosechas.aspx.cs">
+      <DependentUpon>Cosechas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Cosechas.aspx.designer.cs">
+      <DependentUpon>Cosechas.aspx</DependentUpon>
     </Compile>
     <Compile Include="Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
@@ -276,6 +296,13 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Enfermedades.aspx.cs">
+      <DependentUpon>Enfermedades.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Enfermedades.aspx.designer.cs">
+      <DependentUpon>Enfermedades.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Fincas.aspx.cs">
       <DependentUpon>Fincas.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -285,6 +312,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="GruposForza.aspx.cs">
+      <DependentUpon>GruposForza.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GruposForza.aspx.designer.cs">
+      <DependentUpon>GruposForza.aspx</DependentUpon>
     </Compile>
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
@@ -300,7 +334,21 @@
     <Compile Include="Lotes.aspx.designer.cs">
       <DependentUpon>Lotes.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Plagas.aspx.cs">
+      <DependentUpon>Plagas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Plagas.aspx.designer.cs">
+      <DependentUpon>Plagas.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Siembras.aspx.cs">
+      <DependentUpon>Siembras.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Siembras.aspx.designer.cs">
+      <DependentUpon>Siembras.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

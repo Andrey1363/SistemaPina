@@ -26,25 +26,26 @@
             <!-- Menú lateral -->
             <div class="menu-lateral">
                 <ul>
-                    <li><a href="Fincas.aspx">🏡 Fincas</a></li>
-                    <li><a href="Lotes.aspx">🗺️ Lotes</a></li>
-                    <li><a href="Bloques.aspx">📦 Bloques</a></li>
-                    <li><a href="Siembras.aspx">🌱 Siembras</a></li>
-                    <li><a href="Cosechas.aspx">🍍 Cosechas</a></li>
-                    <li><a href="Plagas.aspx">🐛 Plagas</a></li>
-                    <li><a href="Enfermedades.aspx">🦠 Enfermedades</a></li>
-                    <li><a href="Fertilizaciones.aspx">🧪 Fertilizaciones</a></li>
-                    <li><a href="Labores.aspx">👷 Labores</a></li>
-                    <li><a href="Reportes.aspx">📊 Reportes</a></li>
+                    <li><a href="Fincas.aspx"> Fincas</a></li>
+                    <li><a href="Lotes.aspx"> Lotes</a></li>
+                    <li><a href="Bloques.aspx"> Bloques</a></li>
+                    <li><a href="Siembras.aspx"> Siembras</a></li>
+                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
+                    <li><a href="GruposForza.aspx"> Grupos de Forza</a></li>
+                    <li><a href="Plagas.aspx"> Plagas</a></li>
+                    <li><a href="Enfermedades.aspx"> Enfermedades</a></li>
+                    <li><a href="Fertilizaciones.aspx"> Fertilizaciones</a></li>
+                    <li><a href="Labores.aspx"> Labores</a></li>
+                    <li><a href="Reportes.aspx"> Reportes</a></li>
                     <asp:Panel ID="panelUsuarios" runat="server">
-                        <li><a href="Usuarios.aspx">👤 Usuarios</a></li>
+                        <li><a href="Usuarios.aspx"> Usuarios</a></li>
                     </asp:Panel>
                 </ul>
             </div>
 
             <!-- Contenido principal -->
             <div class="contenido">
-                <h2>🗺️ Gestión de Lotes</h2>
+                <h2> Gestión de Lotes</h2>
                 <p>Registrá y administrá los lotes asociados a cada finca.</p>
 
                 <!-- Formulario para agregar lote -->

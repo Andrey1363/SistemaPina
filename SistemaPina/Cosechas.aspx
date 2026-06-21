@@ -1,11 +1,11 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Fincas.aspx.cs" Inherits="SistemaPina.Fincas" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Cosechas.aspx.cs" Inherits="SistemaPina.Cosechas" %>
 
 <!DOCTYPE html>
 <html lang="es">
 <head runat="server">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fincas - Sistema de Gestión de Piña</title>
+    <title>Cosechas - Sistema de Gestión de Piña</title>
     <link rel="stylesheet" href="Estilos.less" />
 </head>
 <body>
@@ -30,8 +30,8 @@
                     <li><a href="Lotes.aspx"> Lotes</a></li>
                     <li><a href="Bloques.aspx"> Bloques</a></li>
                     <li><a href="Siembras.aspx"> Siembras</a></li>
-                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
                     <li><a href="GruposForza.aspx"> Grupos de Forza</a></li>
+                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
                     <li><a href="Plagas.aspx"> Plagas</a></li>
                     <li><a href="Enfermedades.aspx"> Enfermedades</a></li>
                     <li><a href="Fertilizaciones.aspx"> Fertilizaciones</a></li>
@@ -45,44 +45,50 @@
 
             <!-- Contenido principal -->
             <div class="contenido">
-                <h2> Gestión de Fincas</h2>
-                <p>Registrá, consultá y administrá las fincas del sistema.</p>
+                <h2> Registro de Cosechas</h2>
+                <p>Registrá las cosechas por grupo de forza.</p>
 
-                <!-- Formulario para agregar finca -->
+                <!-- Formulario para registrar cosecha -->
                 <div class="formulario-box">
-                    <h3>Agregar nueva finca</h3>
+                    <h3>Registrar nueva cosecha</h3>
 
                     <div class="campo-form">
-                        <label>Nombre de la finca</label>
-                        <asp:TextBox ID="txtNombre" runat="server" placeholder="Ej: Finca La Esperanza"></asp:TextBox>
+                        <label>Grupo de Forza a cosechar</label>
+                        <asp:DropDownList ID="ddlGrupoForza" runat="server" CssClass="ddl"></asp:DropDownList>
                     </div>
 
                     <div class="campo-form">
-                        <label>Ubicación</label>
-                        <asp:TextBox ID="txtUbicacion" runat="server" placeholder="Ej: San Carlos, Alajuela"></asp:TextBox>
+                        <label>Fecha de cosecha</label>
+                        <asp:TextBox ID="txtFechaCosecha" runat="server" TextMode="Date"></asp:TextBox>
                     </div>
 
                     <div class="campo-form">
-                        <label>Área total (hectáreas)</label>
-                        <asp:TextBox ID="txtArea" runat="server" placeholder="Ej: 25.5"></asp:TextBox>
+                        <label>Kilos cosechados</label>
+                        <asp:TextBox ID="txtKilos" runat="server" placeholder="Ej: 2500.50"></asp:TextBox>
                     </div>
 
-                    <!-- Mensaje de error o éxito -->
+                    <div class="campo-form">
+                        <label>Observaciones (opcional)</label>
+                        <asp:TextBox ID="txtObservaciones" runat="server" TextMode="MultiLine" Rows="3" placeholder="Escriba observaciones..."></asp:TextBox>
+                    </div>
+
                     <asp:Label ID="lblMensaje" runat="server" Text="" Visible="false"></asp:Label>
 
-                    <asp:Button ID="btnGuardar" runat="server" Text="Guardar finca" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
+                    <asp:Button ID="btnGuardar" runat="server" Text="Guardar cosecha" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
                 </div>
 
-                <!-- Tabla de fincas registradas -->
+                <!-- Tabla de cosechas -->
                 <div class="tabla-box">
-                    <h3>Fincas registradas</h3>
-                    <asp:GridView ID="gvFincas" runat="server" CssClass="tabla" AutoGenerateColumns="false"
-                        OnRowCommand="gvFincas_RowCommand" DataKeyNames="FincaId">
+                    <h3>Cosechas registradas</h3>
+                    <asp:GridView ID="gvCosechas" runat="server" CssClass="tabla" AutoGenerateColumns="false"
+                        OnRowCommand="gvCosechas_RowCommand" DataKeyNames="CosechaId">
                         <Columns>
-                            <asp:BoundField DataField="FincaId" HeaderText="ID" />
-                            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
-                            <asp:BoundField DataField="Ubicacion" HeaderText="Ubicación" />
-                            <asp:BoundField DataField="AreaTotal" HeaderText="Área (ha)" />
+                            <asp:BoundField DataField="CosechaId" HeaderText="ID" />
+                            <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
+                            <asp:BoundField DataField="NombreGrupo" HeaderText="Grupo Forza" />
+                            <asp:BoundField DataField="Bloques" HeaderText="Bloques" />
+                            <asp:BoundField DataField="FechaCosecha" HeaderText="Fecha cosecha" DataFormatString="{0:dd/MM/yyyy}" />
+                            <asp:BoundField DataField="KilosCosechados" HeaderText="Kilos" />
                             <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
                         </Columns>
                     </asp:GridView>

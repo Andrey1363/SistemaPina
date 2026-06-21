@@ -32,7 +32,8 @@ namespace SistemaPina
             }
         }
 
-        // Método que carga los números de las tarjetas del dashboard
+        
+        // Método que carga los contadores generales del dashboard
         private void CargarContadores()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -41,29 +42,24 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                // Contar total de fincas
+                // Contar total de fincas registradas
                 MySqlCommand cmdFincas = new MySqlCommand(
                     "SELECT COUNT(*) FROM Fincas", conexion.CONECTAR);
                 lblTotalFincas.Text = cmdFincas.ExecuteScalar().ToString();
 
-                // Contar siembras activas
-                MySqlCommand cmdSiembras = new MySqlCommand(
-                    "SELECT COUNT(*) FROM Siembras WHERE Estado = 'Activa'", conexion.CONECTAR);
-                lblTotalSiembras.Text = cmdSiembras.ExecuteScalar().ToString();
+                // Contar grupos de forza registrados
+                MySqlCommand cmdGrupos = new MySqlCommand(
+                    "SELECT COUNT(*) FROM GruposForza", conexion.CONECTAR);
+                lblTotalPlagas.Text = cmdGrupos.ExecuteScalar().ToString();
 
-                // Contar plagas reportadas
-                MySqlCommand cmdPlagas = new MySqlCommand(
-                    "SELECT COUNT(*) FROM Plagas", conexion.CONECTAR);
-                lblTotalPlagas.Text = cmdPlagas.ExecuteScalar().ToString();
-
-                // Contar fertilizaciones aplicadas
-                MySqlCommand cmdFertilizaciones = new MySqlCommand(
-                    "SELECT COUNT(*) FROM Fertilizaciones", conexion.CONECTAR);
-                lblTotalFertilizaciones.Text = cmdFertilizaciones.ExecuteScalar().ToString();
+                // Contar cosechas realizadas
+                MySqlCommand cmdCosechas = new MySqlCommand(
+                    "SELECT COUNT(*) FROM Cosechas", conexion.CONECTAR);
+                lblTotalFertilizaciones.Text = cmdCosechas.ExecuteScalar().ToString();
             }
             catch (Exception ex)
             {
-                // Si hay error simplemente dejamos los contadores en 0
+                // Si hay error dejamos los contadores en 0
             }
             finally
             {

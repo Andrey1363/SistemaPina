@@ -1,11 +1,11 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Fincas.aspx.cs" Inherits="SistemaPina.Fincas" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Bloques.aspx.cs" Inherits="SistemaPina.Bloques" %>
 
 <!DOCTYPE html>
 <html lang="es">
 <head runat="server">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fincas - Sistema de Gestión de Piña</title>
+    <title>Bloques - Sistema de Gestión de Piña</title>
     <link rel="stylesheet" href="Estilos.less" />
 </head>
 <body>
@@ -45,44 +45,49 @@
 
             <!-- Contenido principal -->
             <div class="contenido">
-                <h2> Gestión de Fincas</h2>
-                <p>Registrá, consultá y administrá las fincas del sistema.</p>
+                <h2> Gestión de Bloques</h2>
+                <p>Registrá y administrá los bloques dentro de cada lote.</p>
 
-                <!-- Formulario para agregar finca -->
+                <!-- Formulario para agregar bloque -->
                 <div class="formulario-box">
-                    <h3>Agregar nueva finca</h3>
+                    <h3>Agregar nuevo bloque</h3>
 
                     <div class="campo-form">
-                        <label>Nombre de la finca</label>
-                        <asp:TextBox ID="txtNombre" runat="server" placeholder="Ej: Finca La Esperanza"></asp:TextBox>
+                        <label>Finca</label>
+                        <asp:DropDownList ID="ddlFinca" runat="server" CssClass="ddl" AutoPostBack="true" OnSelectedIndexChanged="ddlFinca_SelectedIndexChanged"></asp:DropDownList>
                     </div>
 
                     <div class="campo-form">
-                        <label>Ubicación</label>
-                        <asp:TextBox ID="txtUbicacion" runat="server" placeholder="Ej: San Carlos, Alajuela"></asp:TextBox>
+                        <label>Lote al que pertenece</label>
+                        <asp:DropDownList ID="ddlLote" runat="server" CssClass="ddl"></asp:DropDownList>
                     </div>
 
                     <div class="campo-form">
-                        <label>Área total (hectáreas)</label>
-                        <asp:TextBox ID="txtArea" runat="server" placeholder="Ej: 25.5"></asp:TextBox>
+                        <label>Nombre del bloque</label>
+                        <asp:TextBox ID="txtNombre" runat="server" placeholder="Ej: Bloque 1"></asp:TextBox>
                     </div>
 
-                    <!-- Mensaje de error o éxito -->
+                    <div class="campo-form">
+                        <label>Área (hectáreas)</label>
+                        <asp:TextBox ID="txtArea" runat="server" placeholder="Ej: 5.5"></asp:TextBox>
+                    </div>
+
                     <asp:Label ID="lblMensaje" runat="server" Text="" Visible="false"></asp:Label>
 
-                    <asp:Button ID="btnGuardar" runat="server" Text="Guardar finca" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
+                    <asp:Button ID="btnGuardar" runat="server" Text="Guardar bloque" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
                 </div>
 
-                <!-- Tabla de fincas registradas -->
+                <!-- Tabla de bloques -->
                 <div class="tabla-box">
-                    <h3>Fincas registradas</h3>
-                    <asp:GridView ID="gvFincas" runat="server" CssClass="tabla" AutoGenerateColumns="false"
-                        OnRowCommand="gvFincas_RowCommand" DataKeyNames="FincaId">
+                    <h3>Bloques registrados</h3>
+                    <asp:GridView ID="gvBloques" runat="server" CssClass="tabla" AutoGenerateColumns="false"
+                        OnRowCommand="gvBloques_RowCommand" DataKeyNames="BloqueId">
                         <Columns>
-                            <asp:BoundField DataField="FincaId" HeaderText="ID" />
-                            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
-                            <asp:BoundField DataField="Ubicacion" HeaderText="Ubicación" />
-                            <asp:BoundField DataField="AreaTotal" HeaderText="Área (ha)" />
+                            <asp:BoundField DataField="BloqueId" HeaderText="ID" />
+                            <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
+                            <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
+                            <asp:BoundField DataField="Nombre" HeaderText="Bloque" />
+                            <asp:BoundField DataField="AreaHectareas" HeaderText="Área (ha)" />
                             <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
                         </Columns>
                     </asp:GridView>
