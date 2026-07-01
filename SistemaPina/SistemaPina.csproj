@@ -181,6 +181,7 @@
     <Content Include="Default.aspx" />
     <Content Include="Enfermedades.aspx" />
     <Content Include="favicon.ico" />
+    <Content Include="Fertilizaciones.aspx" />
     <Content Include="Fincas.aspx" />
     <Content Include="Global.asax" />
     <Content Include="GruposForza.aspx" />
@@ -302,6 +303,13 @@
     </Compile>
     <Compile Include="Enfermedades.aspx.designer.cs">
       <DependentUpon>Enfermedades.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Fertilizaciones.aspx.cs">
+      <DependentUpon>Fertilizaciones.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Fertilizaciones.aspx.designer.cs">
+      <DependentUpon>Fertilizaciones.aspx</DependentUpon>
     </Compile>
     <Compile Include="Fincas.aspx.cs">
       <DependentUpon>Fincas.aspx</DependentUpon>
