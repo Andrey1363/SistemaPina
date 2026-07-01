@@ -12,7 +12,6 @@
 
     <form id="form1" runat="server">
 
-        <!-- Barra superior -->
         <div class="topbar">
             <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
             <div class="topbar-usuario">
@@ -23,32 +22,30 @@
 
         <div class="contenedor-principal">
 
-            <!-- Menú lateral -->
             <div class="menu-lateral">
                 <ul>
-                    <li><a href="Fincas.aspx"> Fincas</a></li>
-                    <li><a href="Lotes.aspx"> Lotes</a></li>
-                    <li><a href="Bloques.aspx"> Bloques</a></li>
-                    <li><a href="Siembras.aspx"> Siembras</a></li>
-                    <li><a href="GruposForza.aspx"> Grupos de Forza</a></li>
-                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
-                    <li><a href="Plagas.aspx"> Plagas</a></li>
-                    <li><a href="Enfermedades.aspx"> Enfermedades</a></li>
-                    <li><a href="Fertilizaciones.aspx"> Fertilizaciones</a></li>
-                    <li><a href="Labores.aspx"> Labores</a></li>
-                    <li><a href="Reportes.aspx"> Reportes</a></li>
+                    <li><a href="Fincas.aspx">Fincas</a></li>
+                    <li><a href="Lotes.aspx">Lotes</a></li>
+                    <li><a href="Bloques.aspx">Bloques</a></li>
+                    <li><a href="Siembras.aspx">Siembras</a></li>
+                    <li><a href="GruposForza.aspx">Grupos de Forza</a></li>
+                    <li><a href="Cosechas.aspx">Cosechas</a></li>
+                    <li><a href="Plagas.aspx">Plagas</a></li>
+                    <li><a href="Enfermedades.aspx">Enfermedades</a></li>
+                    <li><a href="Fertilizaciones.aspx">Fertilizaciones</a></li>
+                    <li><a href="Labores.aspx">Labores</a></li>
+                    <li><a href="Reportes.aspx">Reportes</a></li>
                     <asp:Panel ID="panelUsuarios" runat="server">
-                        <li><a href="Usuarios.aspx"> Usuarios</a></li>
+                        <li><a href="Usuarios.aspx">Usuarios</a></li>
                     </asp:Panel>
                 </ul>
             </div>
 
-            <!-- Contenido principal -->
             <div class="contenido">
-                <h2> Control de Enfermedades</h2>
-                <p>Registrá y controlá las incidencias de enfermedades por bloque.</p>
+                <h2>Control de Enfermedades</h2>
+                <p>Registrá incidencias de enfermedades seleccionando uno o varios bloques afectados.</p>
 
-                <!-- Formulario para registrar enfermedad -->
+                <!-- Formulario registro de enfermedad -->
                 <div class="formulario-box">
                     <h3>Registrar incidencia de enfermedad</h3>
 
@@ -63,8 +60,8 @@
                     </div>
 
                     <div class="campo-form">
-                        <label>Bloque</label>
-                        <asp:DropDownList ID="ddlBloque" runat="server" CssClass="ddl"></asp:DropDownList>
+                        <label>Bloques afectados (podés seleccionar varios)</label>
+                        <asp:CheckBoxList ID="cblBloques" runat="server" CssClass="check-list"></asp:CheckBoxList>
                     </div>
 
                     <div class="campo-form">
@@ -87,21 +84,6 @@
                     </div>
 
                     <div class="campo-form">
-                        <label>Producto aplicado (opcional)</label>
-                        <asp:TextBox ID="txtProducto" runat="server" placeholder="Ej: Ridomil, Mancozeb"></asp:TextBox>
-                    </div>
-
-                    <div class="campo-form">
-                        <label>Dosis/Ha Kg-Lts (opcional)</label>
-                        <asp:TextBox ID="txtDosis" runat="server" placeholder="Ej: 2.5"></asp:TextBox>
-                    </div>
-
-                    <div class="campo-form">
-                        <label>Fecha de control (opcional)</label>
-                        <asp:TextBox ID="txtFechaControl" runat="server" TextMode="Date"></asp:TextBox>
-                    </div>
-
-                    <div class="campo-form">
                         <label>Observaciones (opcional)</label>
                         <asp:TextBox ID="txtObservaciones" runat="server" TextMode="MultiLine" Rows="3" placeholder="Escriba observaciones..."></asp:TextBox>
                     </div>
@@ -111,34 +93,78 @@
                     <asp:Button ID="btnGuardar" runat="server" Text="Guardar registro" CssClass="btn-guardar" OnClick="btnGuardar_Click" />
                 </div>
 
-                <!-- Resumen por bloque -->
-                <div class="tabla-box">
-                    <h3>📊 Resumen de enfermedades por bloque</h3>
-                    <asp:GridView ID="gvResumen" runat="server" CssClass="tabla" AutoGenerateColumns="false">
-                        <Columns>
-                            <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
-                            <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
-                            <asp:BoundField DataField="NombreBloque" HeaderText="Bloque" />
-                            <asp:BoundField DataField="NombreEnfermedad" HeaderText="Enfermedad" />
-                            <asp:BoundField DataField="TotalReportes" HeaderText="Total reportes" />
-                            <asp:BoundField DataField="UltimaDeteccion" HeaderText="Última detección" DataFormatString="{0:dd/MM/yyyy}" />
-                        </Columns>
-                    </asp:GridView>
-                </div>
+                <!-- Panel de recomendación -->
+                <asp:Panel ID="panelRecomendacion" runat="server" Visible="false">
+                    <div class="formulario-box recomendacion-box">
+                        <h3>Generar recomendación de aplicación</h3>
+                        <p class="recomendacion-info">
+                            Enfermedad: <strong><asp:Label ID="lblEnfermedadRecomendacion" runat="server"></asp:Label></strong> |
+                            Bloques: <strong><asp:Label ID="lblBloquesRecomendacion" runat="server"></asp:Label></strong>
+                        </p>
 
-                <!-- Tabla de registros -->
-                <div class="tabla-box" style="margin-top:20px">
+                        <asp:HiddenField ID="hfEnfermedadId" runat="server" />
+
+                        <div class="campo-form">
+                            <label>Producto recomendado</label>
+                            <asp:TextBox ID="txtProductoRec" runat="server" placeholder="Ej: Ridomil, Mancozeb"></asp:TextBox>
+                        </div>
+
+                        <div class="campo-form">
+                            <label>Dosis/Ha Kg-Lts</label>
+                            <asp:TextBox ID="txtDosisRec" runat="server" placeholder="Ej: 3.5 LTS/HA"></asp:TextBox>
+                        </div>
+
+                        <div class="campo-form">
+                            <label>Fecha de aplicación</label>
+                            <asp:TextBox ID="txtFechaRec" runat="server" TextMode="Date"></asp:TextBox>
+                        </div>
+
+                        <div class="campo-form">
+                            <label>Observaciones (opcional)</label>
+                            <asp:TextBox ID="txtObservacionesRec" runat="server" TextMode="MultiLine" Rows="2"></asp:TextBox>
+                        </div>
+
+                        <asp:Label ID="lblMensajeRec" runat="server" Text="" Visible="false"></asp:Label>
+
+                        <asp:Button ID="btnGuardarRec" runat="server" Text="Guardar recomendación" CssClass="btn-guardar" OnClick="btnGuardarRec_Click" />
+                        <asp:Button ID="btnCancelarRec" runat="server" Text="Cancelar" CssClass="btn-eliminar" OnClick="btnCancelarRec_Click" />
+                    </div>
+                </asp:Panel>
+
+                <!-- Tabla registros de enfermedades -->
+                <div class="tabla-box">
                     <h3>Registros de enfermedades</h3>
                     <asp:GridView ID="gvEnfermedades" runat="server" CssClass="tabla" AutoGenerateColumns="false"
                         OnRowCommand="gvEnfermedades_RowCommand" DataKeyNames="EnfermedadId">
                         <Columns>
                             <asp:BoundField DataField="EnfermedadId" HeaderText="ID" />
-                            <asp:BoundField DataField="NombreBloque" HeaderText="Bloque" />
+                            <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
+                            <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
                             <asp:BoundField DataField="NombreEnfermedad" HeaderText="Enfermedad" />
                             <asp:BoundField DataField="NivelAfectacion" HeaderText="Nivel" />
                             <asp:BoundField DataField="FechaDeteccion" HeaderText="Detección" DataFormatString="{0:dd/MM/yyyy}" />
-                            <asp:BoundField DataField="ProductoAplicado" HeaderText="Producto" />
-                            <asp:BoundField DataField="FechaControl" HeaderText="Control" DataFormatString="{0:dd/MM/yyyy}" />
+                            <asp:BoundField DataField="Bloques" HeaderText="Bloques afectados" />
+                            <asp:ButtonField ButtonType="Button" CommandName="Recomendar" Text="Recomendar" ControlStyle-CssClass="btn-recomendar" />
+                            <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
+                        </Columns>
+                    </asp:GridView>
+                </div>
+
+                <!-- Tabla recomendaciones -->
+                <div class="tabla-box" style="margin-top:20px">
+                    <h3>Recomendaciones generadas</h3>
+                    <asp:GridView ID="gvRecomendaciones" runat="server" CssClass="tabla" AutoGenerateColumns="false"
+                        DataKeyNames="RecomendacionId" OnRowCommand="gvRecomendaciones_RowCommand">
+                        <Columns>
+                            <asp:BoundField DataField="RecomendacionId" HeaderText="ID" />
+                            <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
+                            <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
+                            <asp:BoundField DataField="NombreEnfermedad" HeaderText="Enfermedad" />
+                            <asp:BoundField DataField="Bloques" HeaderText="Bloques" />
+                            <asp:BoundField DataField="Producto" HeaderText="Producto" />
+                            <asp:BoundField DataField="Dosis" HeaderText="Dosis" />
+                            <asp:BoundField DataField="FechaAplicacion" HeaderText="Fecha aplicación" DataFormatString="{0:dd/MM/yyyy}" />
+                            <asp:BoundField DataField="Observaciones" HeaderText="Observaciones" />
                             <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
                         </Columns>
                     </asp:GridView>
