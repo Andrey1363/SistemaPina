@@ -7,6 +7,36 @@ namespace SistemaPina
 {
     public partial class Plagas : System.Web.UI.Page
     {
+        // ==========================================
+        // VARIABLES DE ESTADO PARA EDITAR PLAGA
+        // ==========================================
+        private bool Editando
+        {
+            get { return ViewState["EditandoPlaga"] != null && (bool)ViewState["EditandoPlaga"]; }
+            set { ViewState["EditandoPlaga"] = value; }
+        }
+
+        private string IdEditando
+        {
+            get { return ViewState["IdPlagaEditando"] as string; }
+            set { ViewState["IdPlagaEditando"] = value; }
+        }
+
+        // ==========================================
+        // VARIABLES DE ESTADO PARA EDITAR RECOMENDACIÓN
+        // ==========================================
+        private bool EditandoRec
+        {
+            get { return ViewState["EditandoRec"] != null && (bool)ViewState["EditandoRec"]; }
+            set { ViewState["EditandoRec"] = value; }
+        }
+
+        private string IdRecEditando
+        {
+            get { return ViewState["IdRecEditando"] as string; }
+            set { ViewState["IdRecEditando"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UsuarioId"] == null)
@@ -14,8 +44,27 @@ namespace SistemaPina
                 Response.Redirect("Login.aspx");
                 return;
             }
+            // SuperAdmin no tiene acceso a este módulo
+            if (Session["Rol"].ToString() == "SuperAdmin")
+            {
+                Response.Redirect("Usuarios.aspx");
+                return;
+            }
 
-            lblNombreUsuario.Text = "👤 " + Session["Nombre"].ToString();
+            // ==========================================
+            // MOSTRAR USUARIO Y EMPRESA
+            // ==========================================
+            lblNombreUsuario.Text = Session["Nombre"].ToString();
+
+            if (Session["NombreEmpresa"] != null && Session["NombreEmpresa"].ToString() != "")
+            {
+                lblEmpresa.Text = Session["NombreEmpresa"].ToString();
+                lblEmpresa.Visible = true;
+            }
+            else
+            {
+                lblEmpresa.Visible = false;
+            }
 
             if (Session["Rol"].ToString() != "Admin")
             {
@@ -31,14 +80,19 @@ namespace SistemaPina
             }
         }
 
+        // ==========================================
+        // CARGAR FINCAS
+        // ==========================================
         private void CargarFincas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
             try
             {
                 conexion.ABRIR_CONEXION();
-                string consulta = "SELECT FincaId, Nombre FROM Fincas ORDER BY Nombre";
+                string consulta = "SELECT FincaId, Nombre FROM Fincas WHERE EmpresaId = @empresaId ORDER BY Nombre";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -57,6 +111,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
+        // ==========================================
+        // CARGAR LOTES
+        // ==========================================
         private void CargarLotes()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -84,6 +141,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
+        // ==========================================
+        // CARGAR BLOQUES
+        // ==========================================
         private void CargarBloques()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -109,6 +169,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
+        // ==========================================
+        // EVENTOS DE CAMBIO EN DROPDOWNS
+        // ==========================================
         protected void ddlFinca_SelectedIndexChanged(object sender, EventArgs e)
         {
             CargarLotes();
@@ -119,7 +182,98 @@ namespace SistemaPina
             CargarBloques();
         }
 
-        // Verifica alertas de brotes
+        // ==========================================
+        // CARGAR DATOS PARA EDITAR PLAGA
+        // ==========================================
+        private void CargarPlagaParaEditar(string id)
+        {
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+
+                // Obtener datos de la plaga
+                string consulta = "SELECT NombrePlaga, NivelAfectacion, FechaDeteccion, Observaciones FROM Plagas WHERE PlagaId = @id";
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@id", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    txtNombrePlaga.Text = reader["NombrePlaga"].ToString();
+                    ddlNivel.SelectedValue = reader["NivelAfectacion"].ToString();
+                    txtFechaDeteccion.Text = Convert.ToDateTime(reader["FechaDeteccion"]).ToString("yyyy-MM-dd");
+                    txtObservaciones.Text = reader["Observaciones"].ToString();
+                }
+                reader.Close();
+
+                // Marcar los bloques seleccionados
+                string consultaBloques = "SELECT BloqueId FROM PlagaBloques WHERE PlagaId = @id";
+                MySqlCommand cmdBloques = new MySqlCommand(consultaBloques, conexion.CONECTAR);
+                cmdBloques.Parameters.AddWithValue("@id", id);
+                MySqlDataReader readerBloques = cmdBloques.ExecuteReader();
+
+                while (readerBloques.Read())
+                {
+                    string bloqueId = readerBloques["BloqueId"].ToString();
+                    foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
+                    {
+                        if (item.Value == bloqueId)
+                        {
+                            item.Selected = true;
+                        }
+                    }
+                }
+                readerBloques.Close();
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error al cargar datos: " + ex.Message;
+                lblMensaje.Visible = true;
+            }
+            finally
+            {
+                conexion.CERRAR_CONEXION();
+            }
+        }
+
+        // ==========================================
+        // CARGAR DATOS PARA EDITAR RECOMENDACIÓN
+        // ==========================================
+        private void CargarRecomendacionParaEditar(string id)
+        {
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+                string consulta = "SELECT Producto, Dosis, FechaAplicacion, Observaciones FROM Recomendaciones WHERE RecomendacionId = @id";
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@id", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    txtProductoRec.Text = reader["Producto"].ToString();
+                    txtDosisRec.Text = reader["Dosis"].ToString();
+                    txtFechaRec.Text = Convert.ToDateTime(reader["FechaAplicacion"]).ToString("yyyy-MM-dd");
+                    txtObservacionesRec.Text = reader["Observaciones"].ToString();
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                lblMensajeRec.Text = "Error al cargar datos: " + ex.Message;
+                lblMensajeRec.Visible = true;
+            }
+            finally
+            {
+                conexion.CERRAR_CONEXION();
+            }
+        }
+
+        // ==========================================
+        // VERIFICAR ALERTAS (SOLO EMPRESA)
+        // ==========================================
         private void VerificarAlertas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -127,13 +281,20 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "SELECT p.NombrePlaga, COUNT(*) AS Total " +
-                                  "FROM Plagas p " +
-                                  "WHERE p.FechaDeteccion >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
-                                  "GROUP BY p.NombrePlaga " +
-                                  "HAVING COUNT(*) > 3";
+                string consulta = @"
+                    SELECT p.NombrePlaga, COUNT(*) AS Total 
+                    FROM Plagas p
+                    LEFT JOIN PlagaBloques pb ON p.PlagaId = pb.PlagaId
+                    LEFT JOIN Bloques b ON pb.BloqueId = b.BloqueId
+                    LEFT JOIN Lotes l ON b.LoteId = l.LoteId
+                    LEFT JOIN Fincas f ON l.FincaId = f.FincaId
+                    WHERE f.EmpresaId = @empresaId
+                      AND p.FechaDeteccion >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                    GROUP BY p.NombrePlaga
+                    HAVING COUNT(*) > 3";
 
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
                 MySqlDataReader reader = cmd.ExecuteReader();
 
                 string alertas = "";
@@ -157,7 +318,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Carga todos los registros de plagas con finca, lote y bloques
+        // ==========================================
+        // CARGAR PLAGAS (SOLO EMPRESA)
+        // ==========================================
         private void CargarPlagas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -165,24 +328,25 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "SELECT p.PlagaId, p.NombrePlaga, p.NivelAfectacion, " +
-                                  "p.FechaDeteccion, " +
-                                  "f.Nombre AS NombreFinca, " +
-                                  "l.Nombre AS NombreLote, " +
-                                  "GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques " +
-                                  "FROM Plagas p " +
-                                  "LEFT JOIN PlagaBloques pb ON p.PlagaId = pb.PlagaId " +
-                                  "LEFT JOIN Bloques b ON pb.BloqueId = b.BloqueId " +
-                                  "LEFT JOIN Lotes l ON b.LoteId = l.LoteId " +
-                                  "LEFT JOIN Fincas f ON l.FincaId = f.FincaId " +
-                                  "GROUP BY p.PlagaId, p.NombrePlaga, p.NivelAfectacion, p.FechaDeteccion, f.Nombre, l.Nombre " +
-                                  "ORDER BY p.FechaDeteccion DESC";
+                string consulta = @"
+                    SELECT p.PlagaId, p.NombrePlaga, p.NivelAfectacion, 
+                           p.FechaDeteccion, f.Nombre AS NombreFinca, l.Nombre AS NombreLote, 
+                           GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques
+                    FROM Plagas p
+                    LEFT JOIN PlagaBloques pb ON p.PlagaId = pb.PlagaId
+                    LEFT JOIN Bloques b ON pb.BloqueId = b.BloqueId
+                    LEFT JOIN Lotes l ON b.LoteId = l.LoteId
+                    LEFT JOIN Fincas f ON l.FincaId = f.FincaId
+                    WHERE f.EmpresaId = @empresaId
+                    GROUP BY p.PlagaId, p.NombrePlaga, p.NivelAfectacion, p.FechaDeteccion, f.Nombre, l.Nombre
+                    ORDER BY p.FechaDeteccion DESC";
 
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-
                 gvPlagas.DataSource = dt;
                 gvPlagas.DataBind();
             }
@@ -194,8 +358,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Carga todas las recomendaciones
-        // Carga todas las recomendaciones con finca y lote
+        // ==========================================
+        // CARGAR RECOMENDACIONES (SOLO EMPRESA)
+        // ==========================================
         private void CargarRecomendaciones()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -203,21 +368,26 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "SELECT r.RecomendacionId, p.NombrePlaga, " +
-                                  "f.Nombre AS NombreFinca, " +
-                                  "l.Nombre AS NombreLote, " +
-                                  "GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques, " +
-                                  "r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones " +
-                                  "FROM Recomendaciones r " +
-                                  "INNER JOIN Plagas p ON r.PlagaId = p.PlagaId " +
-                                  "LEFT JOIN PlagaBloques pb ON p.PlagaId = pb.PlagaId " +
-                                  "LEFT JOIN Bloques b ON pb.BloqueId = b.BloqueId " +
-                                  "LEFT JOIN Lotes l ON b.LoteId = l.LoteId " +
-                                  "LEFT JOIN Fincas f ON l.FincaId = f.FincaId " +
-                                  "GROUP BY r.RecomendacionId, p.NombrePlaga, f.Nombre, l.Nombre, r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones " +
-                                  "ORDER BY r.FechaAplicacion DESC";
+                string consulta = @"
+                    SELECT r.RecomendacionId, p.NombrePlaga, 
+                           f.Nombre AS NombreFinca, 
+                           l.Nombre AS NombreLote, 
+                           GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques, 
+                           r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones
+                    FROM Recomendaciones r
+                    INNER JOIN Plagas p ON r.PlagaId = p.PlagaId
+                    LEFT JOIN PlagaBloques pb ON p.PlagaId = pb.PlagaId
+                    LEFT JOIN Bloques b ON pb.BloqueId = b.BloqueId
+                    LEFT JOIN Lotes l ON b.LoteId = l.LoteId
+                    LEFT JOIN Fincas f ON l.FincaId = f.FincaId
+                    WHERE f.EmpresaId = @empresaId
+                    GROUP BY r.RecomendacionId, p.NombrePlaga, f.Nombre, l.Nombre, 
+                             r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones
+                    ORDER BY r.FechaAplicacion DESC";
 
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -233,7 +403,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Guarda un nuevo registro de plaga
+        // ==========================================
+        // GUARDAR / ACTUALIZAR PLAGA
+        // ==========================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             string nombre = txtNombrePlaga.Text.Trim();
@@ -260,38 +432,85 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "INSERT INTO Plagas (NombrePlaga, NivelAfectacion, FechaDeteccion, Observaciones) " +
-                                  "VALUES (@nombre, @nivel, @fechaDeteccion, @observaciones)";
-
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@nombre", nombre);
-                cmd.Parameters.AddWithValue("@nivel", nivel);
-                cmd.Parameters.AddWithValue("@fechaDeteccion", fechaDeteccion);
-                cmd.Parameters.AddWithValue("@observaciones", observaciones);
-                cmd.ExecuteNonQuery();
-
-                long plagaId = cmd.LastInsertedId;
-
-                foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
+                if (Editando)
                 {
-                    if (item.Selected)
+                    // ==========================================
+                    // ACTUALIZAR PLAGA
+                    // ==========================================
+                    string consulta = "UPDATE Plagas SET NombrePlaga = @nombre, NivelAfectacion = @nivel, " +
+                                      "FechaDeteccion = @fechaDeteccion, Observaciones = @observaciones " +
+                                      "WHERE PlagaId = @id";
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@nivel", nivel);
+                    cmd.Parameters.AddWithValue("@fechaDeteccion", fechaDeteccion);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.Parameters.AddWithValue("@id", IdEditando);
+                    cmd.ExecuteNonQuery();
+
+                    // Eliminar bloques antiguos
+                    string eliminarBloques = "DELETE FROM PlagaBloques WHERE PlagaId = @id";
+                    MySqlCommand cmdEliminar = new MySqlCommand(eliminarBloques, conexion.CONECTAR);
+                    cmdEliminar.Parameters.AddWithValue("@id", IdEditando);
+                    cmdEliminar.ExecuteNonQuery();
+
+                    // Insertar bloques seleccionados
+                    foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
                     {
-                        string insertBloque = "INSERT INTO PlagaBloques (PlagaId, BloqueId) VALUES (@plagaId, @bloqueId)";
-                        MySqlCommand cmdBloque = new MySqlCommand(insertBloque, conexion.CONECTAR);
-                        cmdBloque.Parameters.AddWithValue("@plagaId", plagaId);
-                        cmdBloque.Parameters.AddWithValue("@bloqueId", item.Value);
-                        cmdBloque.ExecuteNonQuery();
+                        if (item.Selected)
+                        {
+                            string insertBloque = "INSERT INTO PlagaBloques (PlagaId, BloqueId) VALUES (@plagaId, @bloqueId)";
+                            MySqlCommand cmdBloque = new MySqlCommand(insertBloque, conexion.CONECTAR);
+                            cmdBloque.Parameters.AddWithValue("@plagaId", IdEditando);
+                            cmdBloque.Parameters.AddWithValue("@bloqueId", item.Value);
+                            cmdBloque.ExecuteNonQuery();
+                        }
                     }
+
+                    lblMensaje.Text = "✅ Plaga actualizada correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
+
+                    Editando = false;
+                    IdEditando = null;
+                    btnGuardar.Text = "Guardar plaga";
+                }
+                else
+                {
+                    // ==========================================
+                    // INSERTAR NUEVA PLAGA
+                    // ==========================================
+                    string consulta = "INSERT INTO Plagas (NombrePlaga, NivelAfectacion, FechaDeteccion, Observaciones) " +
+                                      "VALUES (@nombre, @nivel, @fechaDeteccion, @observaciones)";
+
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@nivel", nivel);
+                    cmd.Parameters.AddWithValue("@fechaDeteccion", fechaDeteccion);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.ExecuteNonQuery();
+
+                    long plagaId = cmd.LastInsertedId;
+
+                    foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            string insertBloque = "INSERT INTO PlagaBloques (PlagaId, BloqueId) VALUES (@plagaId, @bloqueId)";
+                            MySqlCommand cmdBloque = new MySqlCommand(insertBloque, conexion.CONECTAR);
+                            cmdBloque.Parameters.AddWithValue("@plagaId", plagaId);
+                            cmdBloque.Parameters.AddWithValue("@bloqueId", item.Value);
+                            cmdBloque.ExecuteNonQuery();
+                        }
+                    }
+
+                    lblMensaje.Text = "✅ Plaga registrada correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
                 }
 
                 txtNombrePlaga.Text = "";
                 txtFechaDeteccion.Text = "";
                 txtObservaciones.Text = "";
-
-                lblMensaje.Text = "✅ Plaga registrada correctamente.";
-                lblMensaje.CssClass = "mensaje-exito";
                 lblMensaje.Visible = true;
-
                 CargarPlagas();
                 VerificarAlertas();
             }
@@ -304,13 +523,117 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Maneja botones de la tabla
+        // ==========================================
+        // GUARDAR / ACTUALIZAR RECOMENDACIÓN
+        // ==========================================
+        protected void btnGuardarRec_Click(object sender, EventArgs e)
+        {
+            string producto = txtProductoRec.Text.Trim();
+            string dosis = txtDosisRec.Text.Trim();
+            string fecha = txtFechaRec.Text.Trim();
+            string observaciones = txtObservacionesRec.Text.Trim();
+            string plagaId = hfPlagaId.Value;
+
+            if (producto == "" || dosis == "" || fecha == "")
+            {
+                lblMensajeRec.Text = "Producto, dosis y fecha son obligatorios.";
+                lblMensajeRec.CssClass = "mensaje-error";
+                lblMensajeRec.Visible = true;
+                return;
+            }
+
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+
+                if (EditandoRec)
+                {
+                    // ==========================================
+                    // ACTUALIZAR RECOMENDACIÓN
+                    // ==========================================
+                    string consulta = "UPDATE Recomendaciones SET Producto = @producto, Dosis = @dosis, " +
+                                      "FechaAplicacion = @fecha, Observaciones = @observaciones " +
+                                      "WHERE RecomendacionId = @id";
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@producto", producto);
+                    cmd.Parameters.AddWithValue("@dosis", dosis);
+                    cmd.Parameters.AddWithValue("@fecha", fecha);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.Parameters.AddWithValue("@id", IdRecEditando);
+                    cmd.ExecuteNonQuery();
+
+                    lblMensajeRec.Text = "✅ Recomendación actualizada correctamente.";
+                    lblMensajeRec.CssClass = "mensaje-exito";
+
+                    EditandoRec = false;
+                    IdRecEditando = null;
+                    btnGuardarRec.Text = "Guardar recomendación";
+                }
+                else
+                {
+                    // ==========================================
+                    // INSERTAR NUEVA RECOMENDACIÓN
+                    // ==========================================
+                    string consulta = "INSERT INTO Recomendaciones (PlagaId, Producto, Dosis, FechaAplicacion, Observaciones) " +
+                                      "VALUES (@plagaId, @producto, @dosis, @fecha, @observaciones)";
+
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@plagaId", plagaId);
+                    cmd.Parameters.AddWithValue("@producto", producto);
+                    cmd.Parameters.AddWithValue("@dosis", dosis);
+                    cmd.Parameters.AddWithValue("@fecha", fecha);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.ExecuteNonQuery();
+
+                    lblMensajeRec.Text = "✅ Recomendación guardada correctamente.";
+                    lblMensajeRec.CssClass = "mensaje-exito";
+                }
+
+                txtProductoRec.Text = "";
+                txtDosisRec.Text = "";
+                txtObservacionesRec.Text = "";
+                lblMensajeRec.Visible = true;
+
+                panelRecomendacion.Visible = false;
+                CargarPlagas();
+                CargarRecomendaciones();
+            }
+            catch (Exception ex)
+            {
+                lblMensajeRec.Text = "Error al guardar: " + ex.Message;
+                lblMensajeRec.CssClass = "mensaje-error";
+                lblMensajeRec.Visible = true;
+            }
+            finally { conexion.CERRAR_CONEXION(); }
+        }
+
+        // ==========================================
+        // CANCELAR RECOMENDACIÓN
+        // ==========================================
+        protected void btnCancelarRec_Click(object sender, EventArgs e)
+        {
+            panelRecomendacion.Visible = false;
+            txtProductoRec.Text = "";
+            txtDosisRec.Text = "";
+            txtObservacionesRec.Text = "";
+        }
+
+        // ==========================================
+        // COMANDOS DE TABLA PLAGAS (Recomendar, Editar, Eliminar)
+        // ==========================================
         protected void gvPlagas_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            int index = Convert.ToInt32(e.CommandArgument);
-            string plagaId = gvPlagas.DataKeys[index].Value.ToString();
+            string plagaId = e.CommandArgument.ToString();
 
-            if (e.CommandName == "Recomendar")
+            if (e.CommandName == "Editar")
+            {
+                CargarPlagaParaEditar(plagaId);
+                Editando = true;
+                IdEditando = plagaId;
+                btnGuardar.Text = "✅ Actualizar Plaga";
+            }
+            else if (e.CommandName == "Recomendar")
             {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
                 try
@@ -380,77 +703,22 @@ namespace SistemaPina
             }
         }
 
-        // Guarda la recomendación
-        protected void btnGuardarRec_Click(object sender, EventArgs e)
-        {
-            string producto = txtProductoRec.Text.Trim();
-            string dosis = txtDosisRec.Text.Trim();
-            string fecha = txtFechaRec.Text.Trim();
-            string observaciones = txtObservacionesRec.Text.Trim();
-            string plagaId = hfPlagaId.Value;
-
-            if (producto == "" || dosis == "" || fecha == "")
-            {
-                lblMensajeRec.Text = "Producto, dosis y fecha son obligatorios.";
-                lblMensajeRec.CssClass = "mensaje-error";
-                lblMensajeRec.Visible = true;
-                return;
-            }
-
-            CLASS_CONEXION conexion = new CLASS_CONEXION();
-            try
-            {
-                conexion.ABRIR_CONEXION();
-
-                string consulta = "INSERT INTO Recomendaciones (PlagaId, Producto, Dosis, FechaAplicacion, Observaciones) " +
-                                  "VALUES (@plagaId, @producto, @dosis, @fecha, @observaciones)";
-
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@plagaId", plagaId);
-                cmd.Parameters.AddWithValue("@producto", producto);
-                cmd.Parameters.AddWithValue("@dosis", dosis);
-                cmd.Parameters.AddWithValue("@fecha", fecha);
-                cmd.Parameters.AddWithValue("@observaciones", string.IsNullOrEmpty(observaciones) ? (object)DBNull.Value : observaciones);
-                cmd.ExecuteNonQuery();
-
-                txtProductoRec.Text = "";
-                txtDosisRec.Text = "";
-                txtObservacionesRec.Text = "";
-
-                lblMensajeRec.Text = "✅ Recomendación guardada correctamente.";
-                lblMensajeRec.CssClass = "mensaje-exito";
-                lblMensajeRec.Visible = true;
-
-                panelRecomendacion.Visible = false;
-                CargarPlagas();
-                CargarRecomendaciones();
-            }
-            catch (Exception ex)
-            {
-                lblMensajeRec.Text = "Error al guardar: " + ex.Message;
-                lblMensajeRec.CssClass = "mensaje-error";
-                lblMensajeRec.Visible = true;
-            }
-            finally { conexion.CERRAR_CONEXION(); }
-        }
-
-        // Cancela la recomendación
-        protected void btnCancelarRec_Click(object sender, EventArgs e)
-        {
-            panelRecomendacion.Visible = false;
-            txtProductoRec.Text = "";
-            txtDosisRec.Text = "";
-            txtObservacionesRec.Text = "";
-        }
-
-        // Elimina una recomendación
+        // ==========================================
+        // COMANDOS DE TABLA RECOMENDACIONES (Editar, Eliminar)
+        // ==========================================
         protected void gvRecomendaciones_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
-            {
-                int index = Convert.ToInt32(e.CommandArgument);
-                string recId = gvRecomendaciones.DataKeys[index].Value.ToString();
+            string recId = e.CommandArgument.ToString();
 
+            if (e.CommandName == "EditarRec")
+            {
+                CargarRecomendacionParaEditar(recId);
+                EditandoRec = true;
+                IdRecEditando = recId;
+                btnGuardarRec.Text = "✅ Actualizar Recomendación";
+            }
+            else if (e.CommandName == "Eliminar")
+            {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
                 try
                 {
@@ -476,7 +744,9 @@ namespace SistemaPina
             }
         }
 
-        // Cerrar sesión
+        // ==========================================
+        // CERRAR SESIÓN
+        // ==========================================
         protected void btnCerrarSesion_Click(object sender, EventArgs e)
         {
             Session.Clear();

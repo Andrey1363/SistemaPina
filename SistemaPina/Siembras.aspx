@@ -6,20 +6,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Siembras - Sistema de Gestión de Piña</title>
-    <link rel="stylesheet" href="Estilos.less" />
+    <link rel="stylesheet" href="Estilos.css" />
 </head>
 <body>
 
     <form id="form1" runat="server">
-
-        <!-- Barra superior -->
+        <%-- Barra superior --%>
         <div class="topbar">
-            <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
-            <div class="topbar-usuario">
-                <asp:Label ID="lblNombreUsuario" runat="server"></asp:Label>
-                <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar sesión" CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+    <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
+    <div class="topbar-usuario">
+        <div class="usuario-info">
+            <div class="usuario-nombre">
+                👤 <asp:Label ID="lblNombreUsuario" runat="server"></asp:Label>
+            </div>
+            <div class="usuario-empresa">
+                🍍 <asp:Label ID="lblEmpresa" runat="server"></asp:Label>
             </div>
         </div>
+        <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar sesión" CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+    </div>
+</div>
 
         <div class="contenedor-principal">
 
@@ -101,7 +107,6 @@
                     <asp:GridView ID="gvSiembras" runat="server" CssClass="tabla" AutoGenerateColumns="false"
                         OnRowCommand="gvSiembras_RowCommand" DataKeyNames="SiembraId">
                         <Columns>
-                            <asp:BoundField DataField="SiembraId" HeaderText="ID" />
                             <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
                             <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
                             <asp:BoundField DataField="NombreBloque" HeaderText="Bloque" />
@@ -110,7 +115,19 @@
                             <asp:BoundField DataField="CantidadPlantas" HeaderText="Plantas" />
                             <asp:BoundField DataField="TipoEtapa" HeaderText="Etapa" />
                             <asp:BoundField DataField="Estado" HeaderText="Estado" />
-                            <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
+        
+                            <asp:TemplateField HeaderText="Acciones" ItemStyle-HorizontalAlign="Center">
+                                <ItemTemplate>
+                                    <asp:Button ID="btnEditar" runat="server" Text="Editar"
+                                        CommandName="Editar"
+                                        CommandArgument='<%# Eval("SiembraId") %>'
+                                        CssClass="btn-editar" />
+                                    <asp:Button ID="btnEliminar" runat="server" Text="Eliminar"
+                                        CommandName="Eliminar"
+                                        CommandArgument='<%# Eval("SiembraId") %>'
+                                        CssClass="btn-eliminar" />
+                                </ItemTemplate>
+                            </asp:TemplateField>
                         </Columns>
                     </asp:GridView>
                 </div>

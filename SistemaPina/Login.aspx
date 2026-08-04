@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión de Piña</title>
-    <link rel="stylesheet" href="Estilos.less" />
+    <link rel="stylesheet" href="Estilos.css" />
     
 </head>
 <body>

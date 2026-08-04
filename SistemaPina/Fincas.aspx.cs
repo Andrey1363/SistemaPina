@@ -7,50 +7,84 @@ namespace SistemaPina
 {
     public partial class Fincas : System.Web.UI.Page
     {
+        // ==========================================
+        // VARIABLES DE ESTADO PARA EDITAR
+        // ==========================================
+        private bool Editando
+        {
+            get { return ViewState["EditandoFinca"] != null && (bool)ViewState["EditandoFinca"]; }
+            set { ViewState["EditandoFinca"] = value; }
+        }
+
+        private string IdEditando
+        {
+            get { return ViewState["IdFincaEditando"] as string; }
+            set { ViewState["IdFincaEditando"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Verificar sesión activa
             if (Session["UsuarioId"] == null)
             {
                 Response.Redirect("Login.aspx");
                 return;
             }
 
-            // Mostrar nombre del usuario
-            lblNombreUsuario.Text = "👤 " + Session["Nombre"].ToString();
+            if (Session["Rol"].ToString() == "SuperAdmin")
+            {
+                Response.Redirect("Usuarios.aspx");
+                return;
+            }
 
-            // Ocultar usuarios si no es Admin
+            // ==========================================
+            // MOSTRAR USUARIO Y EMPRESA
+            // ==========================================
+            lblNombreUsuario.Text = Session["Nombre"].ToString();
+
+            if (Session["NombreEmpresa"] != null && Session["NombreEmpresa"].ToString() != "")
+            {
+                lblEmpresa.Text = Session["NombreEmpresa"].ToString();
+                lblEmpresa.Visible = true;
+            }
+            else
+            {
+                lblEmpresa.Visible = false;
+            }
+
             if (Session["Rol"].ToString() != "Admin")
             {
                 panelUsuarios.Visible = false;
             }
 
-            // Cargar la tabla solo la primera vez
             if (!IsPostBack)
             {
                 CargarFincas();
             }
         }
 
-        // Método que carga todas las fincas en la tabla
+        // ==========================================
+        // CARGAR FINCAS
+        // ==========================================
         private void CargarFincas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
 
-                // Consulta para traer todas las fincas
-                string consulta = "SELECT FincaId, Nombre, Ubicacion, AreaTotal FROM Fincas ORDER BY Nombre";
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                string consulta = "SELECT f.FincaId, f.Nombre, f.Ubicacion, f.AreaTotal, " +
+                                  "e.NombreEmpresa FROM Fincas f " +
+                                  "LEFT JOIN Empresas e ON f.EmpresaId = e.EmpresaId " +
+                                  "WHERE f.EmpresaId = @empresaId " +
+                                  "ORDER BY f.Nombre";
 
-                // Llenar un DataTable con los resultados
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
-                // Conectar el DataTable a la tabla visual
                 gvFincas.DataSource = dt;
                 gvFincas.DataBind();
             }
@@ -59,21 +93,51 @@ namespace SistemaPina
                 lblMensaje.Text = "Error al cargar fincas: " + ex.Message;
                 lblMensaje.Visible = true;
             }
+            finally { conexion.CERRAR_CONEXION(); }
+        }
+
+        // ==========================================
+        // CARGAR DATOS PARA EDITAR
+        // ==========================================
+        private void CargarFincaParaEditar(string id)
+        {
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+                string consulta = "SELECT Nombre, Ubicacion, AreaTotal FROM Fincas WHERE FincaId = @id";
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@id", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    txtNombre.Text = reader["Nombre"].ToString();
+                    txtUbicacion.Text = reader["Ubicacion"].ToString();
+                    txtArea.Text = reader["AreaTotal"].ToString();
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error al cargar datos: " + ex.Message;
+                lblMensaje.Visible = true;
+            }
             finally
             {
                 conexion.CERRAR_CONEXION();
             }
         }
 
-        // Método que guarda una nueva finca
+        // ==========================================
+        // GUARDAR / ACTUALIZAR FINCA
+        // ==========================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
-            // Obtener los valores del formulario
             string nombre = txtNombre.Text.Trim();
             string ubicacion = txtUbicacion.Text.Trim();
             string area = txtArea.Text.Trim();
 
-            // Validar que no estén vacíos
             if (nombre == "" || area == "")
             {
                 lblMensaje.Text = "El nombre y el área son obligatorios.";
@@ -83,34 +147,54 @@ namespace SistemaPina
             }
 
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
 
-                // Consulta para insertar la nueva finca
-                string consulta = "INSERT INTO Fincas (UsuarioId, Nombre, Ubicacion, AreaTotal) " +
-                                  "VALUES (@usuarioId, @nombre, @ubicacion, @area)";
+                if (Editando)
+                {
+                    // ==========================================
+                    // ACTUALIZAR FINCA EXISTENTE
+                    // ==========================================
+                    string consulta = "UPDATE Fincas SET Nombre = @nombre, Ubicacion = @ubicacion, AreaTotal = @area WHERE FincaId = @id";
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@ubicacion", ubicacion);
+                    cmd.Parameters.AddWithValue("@area", area);
+                    cmd.Parameters.AddWithValue("@id", IdEditando);
+                    cmd.ExecuteNonQuery();
 
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@usuarioId", Session["UsuarioId"].ToString());
-                cmd.Parameters.AddWithValue("@nombre", nombre);
-                cmd.Parameters.AddWithValue("@ubicacion", ubicacion);
-                cmd.Parameters.AddWithValue("@area", area);
+                    lblMensaje.Text = "✅ Finca actualizada correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
 
-                cmd.ExecuteNonQuery();
+                    Editando = false;
+                    IdEditando = null;
+                    btnGuardar.Text = "💾 Guardar Finca";
+                }
+                else
+                {
+                    // ==========================================
+                    // INSERTAR NUEVA FINCA
+                    // ==========================================
+                    string consulta = "INSERT INTO Fincas (UsuarioId, EmpresaId, Nombre, Ubicacion, AreaTotal) " +
+                                      "VALUES (@usuarioId, @empresaId, @nombre, @ubicacion, @area)";
 
-                // Limpiar los campos del formulario
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@usuarioId", Session["UsuarioId"].ToString());
+                    cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@ubicacion", ubicacion);
+                    cmd.Parameters.AddWithValue("@area", area);
+                    cmd.ExecuteNonQuery();
+
+                    lblMensaje.Text = "✅ Finca guardada correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
+                }
+
                 txtNombre.Text = "";
                 txtUbicacion.Text = "";
                 txtArea.Text = "";
-
-                // Mostrar mensaje de éxito
-                lblMensaje.Text = "✅ Finca guardada correctamente.";
-                lblMensaje.CssClass = "mensaje-exito";
                 lblMensaje.Visible = true;
-
-                // Recargar la tabla
                 CargarFincas();
             }
             catch (Exception ex)
@@ -119,27 +203,30 @@ namespace SistemaPina
                 lblMensaje.CssClass = "mensaje-error";
                 lblMensaje.Visible = true;
             }
-            finally
-            {
-                conexion.CERRAR_CONEXION();
-            }
+            finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Método para eliminar una finca
+        // ==========================================
+        // ELIMINAR / EDITAR (RowCommand)
+        // ==========================================
         protected void gvFincas_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
+            // El ID llega directamente desde el CommandArgument del botón
+            string fincaId = e.CommandArgument.ToString();
+
+            if (e.CommandName == "Editar")
             {
-                // Obtener el ID de la finca a eliminar
-                int index = Convert.ToInt32(e.CommandArgument);
-                string fincaId = gvFincas.DataKeys[index].Value.ToString();
-
+                CargarFincaParaEditar(fincaId);
+                Editando = true;
+                IdEditando = fincaId;
+                btnGuardar.Text = "✅ Actualizar Finca";
+            }
+            else if (e.CommandName == "Eliminar")
+            {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
-
                 try
                 {
                     conexion.ABRIR_CONEXION();
-
                     string consulta = "DELETE FROM Fincas WHERE FincaId = @fincaId";
                     MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                     cmd.Parameters.AddWithValue("@fincaId", fincaId);
@@ -157,14 +244,13 @@ namespace SistemaPina
                     lblMensaje.CssClass = "mensaje-error";
                     lblMensaje.Visible = true;
                 }
-                finally
-                {
-                    conexion.CERRAR_CONEXION();
-                }
+                finally { conexion.CERRAR_CONEXION(); }
             }
         }
 
-        // Cerrar sesión
+        // ==========================================
+        // CERRAR SESIÓN
+        // ==========================================
         protected void btnCerrarSesion_Click(object sender, EventArgs e)
         {
             Session.Clear();

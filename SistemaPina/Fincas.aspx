@@ -6,21 +6,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fincas - Sistema de Gestión de Piña</title>
-    <link rel="stylesheet" href="Estilos.less" />
+    <link rel="stylesheet" href="Estilos.css" />
 </head>
 <body>
 
     <form id="form1" runat="server">
 
         <!-- Barra superior -->
-        <div class="topbar">
-            <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
-            <div class="topbar-usuario">
-                <asp:Label ID="lblNombreUsuario" runat="server"></asp:Label>
-                <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar sesión" CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+<div class="topbar">
+    <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
+    <div class="topbar-usuario">
+        <div class="usuario-info">
+            <div class="usuario-nombre">
+                👤 <asp:Label ID="lblNombreUsuario" runat="server"></asp:Label>
+            </div>
+            <div class="usuario-empresa">
+                🍍 <asp:Label ID="lblEmpresa" runat="server"></asp:Label>
             </div>
         </div>
-
+        <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar sesión" CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+    </div>
+</div>
         <div class="contenedor-principal">
 
             <!-- Menú lateral -->
@@ -79,11 +85,22 @@
                     <asp:GridView ID="gvFincas" runat="server" CssClass="tabla" AutoGenerateColumns="false"
                         OnRowCommand="gvFincas_RowCommand" DataKeyNames="FincaId">
                         <Columns>
-                            <asp:BoundField DataField="FincaId" HeaderText="ID" />
+                            
+                            <asp:BoundField DataField="NombreEmpresa" HeaderText="Empresa" />
                             <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
                             <asp:BoundField DataField="Ubicacion" HeaderText="Ubicación" />
                             <asp:BoundField DataField="AreaTotal" HeaderText="Área (ha)" />
-                            <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
+                            
+                            <asp:TemplateField HeaderText="Acciones">
+                            <ItemTemplate>
+                              <asp:Button ID="btnEditar" runat="server" Text="Editar" 
+                                CommandName="Editar" CommandArgument='<%# Eval("FincaId") %>' 
+                                CssClass="btn-editar" />
+                              <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" 
+                                CommandName="Eliminar" CommandArgument='<%# Eval("FincaId") %>' 
+                                CssClass="btn-eliminar" />
+                            </ItemTemplate>
+                            </asp:TemplateField>
                         </Columns>
                     </asp:GridView>
                 </div>

@@ -42,6 +42,15 @@ namespace SistemaPina
         protected global::System.Web.UI.WebControls.Button btnCerrarSesion;
 
         /// <summary>
+        /// Control panelMenuNormal.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelMenuNormal;
+
+        /// <summary>
         /// Control panelUsuarios.
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace SistemaPina
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel panelUsuarios;
+
+        /// <summary>
+        /// Control panelMenuSuperAdmin.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelMenuSuperAdmin;
 
         /// <summary>
         /// Control lblTotalFincas.

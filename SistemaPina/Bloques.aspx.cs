@@ -7,16 +7,48 @@ namespace SistemaPina
 {
     public partial class Bloques : System.Web.UI.Page
     {
+        // ==========================================
+        // VARIABLES DE ESTADO PARA EDITAR
+        // ==========================================
+        private bool Editando
+        {
+            get { return ViewState["EditandoBloque"] != null && (bool)ViewState["EditandoBloque"]; }
+            set { ViewState["EditandoBloque"] = value; }
+        }
+
+        private string IdEditando
+        {
+            get { return ViewState["IdBloqueEditando"] as string; }
+            set { ViewState["IdBloqueEditando"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Verificar sesión activa
             if (Session["UsuarioId"] == null)
             {
                 Response.Redirect("Login.aspx");
                 return;
             }
+            if (Session["Rol"].ToString() == "SuperAdmin")
+            {
+                Response.Redirect("Usuarios.aspx");
+                return;
+            }
 
-            lblNombreUsuario.Text = "👤 " + Session["Nombre"].ToString();
+            // ==========================================
+            // MOSTRAR USUARIO Y EMPRESA
+            // ==========================================
+            lblNombreUsuario.Text = Session["Nombre"].ToString();
+
+            if (Session["NombreEmpresa"] != null && Session["NombreEmpresa"].ToString() != "")
+            {
+                lblEmpresa.Text = Session["NombreEmpresa"].ToString();
+                lblEmpresa.Visible = true;
+            }
+            else
+            {
+                lblEmpresa.Visible = false;
+            }
 
             if (Session["Rol"].ToString() != "Admin")
             {
@@ -30,7 +62,9 @@ namespace SistemaPina
             }
         }
 
-        // Carga las fincas en el primer dropdown
+        // ==========================================
+        // CARGAR FINCAS
+        // ==========================================
         private void CargarFincas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -39,8 +73,9 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "SELECT FincaId, Nombre FROM Fincas ORDER BY Nombre";
+                string consulta = "SELECT FincaId, Nombre FROM Fincas WHERE EmpresaId = @empresaId ORDER BY Nombre";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
 
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -52,7 +87,6 @@ namespace SistemaPina
                 ddlFinca.DataBind();
                 ddlFinca.Items.Insert(0, "-- Seleccione una finca --");
 
-                // Cargar los lotes de la primera finca
                 CargarLotes();
             }
             catch (Exception ex)
@@ -66,7 +100,9 @@ namespace SistemaPina
             }
         }
 
-        // Carga los lotes según la finca seleccionada
+        // ==========================================
+        // CARGAR LOTES
+        // ==========================================
         private void CargarLotes()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -102,40 +138,31 @@ namespace SistemaPina
             }
         }
 
-        // Se ejecuta cuando el usuario cambia la finca seleccionada
-        // Actualiza automáticamente los lotes del dropdown
-        protected void ddlFinca_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            CargarLotes();
-        }
-
-        // Carga todos los bloques en la tabla
-        private void CargarBloques()
+        // ==========================================
+        // CARGAR DATOS PARA EDITAR
+        // ==========================================
+        private void CargarBloqueParaEditar(string id)
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
-
-                string consulta = "SELECT b.BloqueId, f.Nombre AS NombreFinca, l.Nombre AS NombreLote, " +
-                                  "b.Nombre, b.AreaHectareas " +
-                                  "FROM Bloques b " +
-                                  "INNER JOIN Lotes l ON b.LoteId = l.LoteId " +
-                                  "INNER JOIN Fincas f ON l.FincaId = f.FincaId " +
-                                  "ORDER BY f.Nombre, l.Nombre, b.Nombre";
-
+                string consulta = "SELECT LoteId, Nombre, AreaHectareas FROM Bloques WHERE BloqueId = @id";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                cmd.Parameters.AddWithValue("@id", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
 
-                gvBloques.DataSource = dt;
-                gvBloques.DataBind();
+                if (reader.Read())
+                {
+                    ddlLote.SelectedValue = reader["LoteId"].ToString();
+                    txtNombre.Text = reader["Nombre"].ToString();
+                    txtArea.Text = reader["AreaHectareas"].ToString();
+                }
+                reader.Close();
             }
             catch (Exception ex)
             {
-                lblMensaje.Text = "Error al cargar bloques: " + ex.Message;
+                lblMensaje.Text = "Error al cargar datos: " + ex.Message;
                 lblMensaje.Visible = true;
             }
             finally
@@ -144,7 +171,46 @@ namespace SistemaPina
             }
         }
 
-        // Guarda un nuevo bloque
+        protected void ddlFinca_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CargarLotes();
+        }
+
+        // ==========================================
+        // CARGAR BLOQUES
+        // ==========================================
+        private void CargarBloques()
+        {
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+                string consulta = "SELECT b.BloqueId, f.Nombre AS NombreFinca, l.Nombre AS NombreLote, " +
+                                  "b.Nombre, b.AreaHectareas " +
+                                  "FROM Bloques b " +
+                                  "INNER JOIN Lotes l ON b.LoteId = l.LoteId " +
+                                  "INNER JOIN Fincas f ON l.FincaId = f.FincaId " +
+                                  "WHERE f.EmpresaId = @empresaId " +
+                                  "ORDER BY f.Nombre, l.Nombre, b.Nombre";
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+                MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                gvBloques.DataSource = dt;
+                gvBloques.DataBind();
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error: " + ex.Message;
+                lblMensaje.Visible = true;
+            }
+            finally { conexion.CERRAR_CONEXION(); }
+        }
+
+        // ==========================================
+        // GUARDAR / ACTUALIZAR BLOQUE
+        // ==========================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             string nombre = txtNombre.Text.Trim();
@@ -165,23 +231,47 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "INSERT INTO Bloques (LoteId, Nombre, AreaHectareas) " +
-                                  "VALUES (@loteId, @nombre, @area)";
+                if (Editando)
+                {
+                    // ==========================================
+                    // ACTUALIZAR BLOQUE
+                    // ==========================================
+                    string consulta = "UPDATE Bloques SET LoteId = @loteId, Nombre = @nombre, AreaHectareas = @area WHERE BloqueId = @id";
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@loteId", loteId);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@area", area);
+                    cmd.Parameters.AddWithValue("@id", IdEditando);
+                    cmd.ExecuteNonQuery();
 
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@loteId", loteId);
-                cmd.Parameters.AddWithValue("@nombre", nombre);
-                cmd.Parameters.AddWithValue("@area", area);
+                    lblMensaje.Text = "✅ Bloque actualizado correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
 
-                cmd.ExecuteNonQuery();
+                    Editando = false;
+                    IdEditando = null;
+                    btnGuardar.Text = "Guardar bloque";
+                }
+                else
+                {
+                    // ==========================================
+                    // INSERTAR NUEVO BLOQUE
+                    // ==========================================
+                    string consulta = "INSERT INTO Bloques (LoteId, Nombre, AreaHectareas) " +
+                                      "VALUES (@loteId, @nombre, @area)";
+
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@loteId", loteId);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@area", area);
+                    cmd.ExecuteNonQuery();
+
+                    lblMensaje.Text = "✅ Bloque guardado correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
+                }
 
                 txtNombre.Text = "";
                 txtArea.Text = "";
-
-                lblMensaje.Text = "✅ Bloque guardado correctamente.";
-                lblMensaje.CssClass = "mensaje-exito";
                 lblMensaje.Visible = true;
-
                 CargarBloques();
             }
             catch (Exception ex)
@@ -196,14 +286,22 @@ namespace SistemaPina
             }
         }
 
-        // Elimina un bloque
+        // ==========================================
+        // ELIMINAR / EDITAR (RowCommand)
+        // ==========================================
         protected void gvBloques_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
-            {
-                int index = Convert.ToInt32(e.CommandArgument);
-                string bloqueId = gvBloques.DataKeys[index].Value.ToString();
+            string bloqueId = e.CommandArgument.ToString();
 
+            if (e.CommandName == "Editar")
+            {
+                CargarBloqueParaEditar(bloqueId);
+                Editando = true;
+                IdEditando = bloqueId;
+                btnGuardar.Text = "✅ Actualizar Bloque";
+            }
+            else if (e.CommandName == "Eliminar")
+            {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
 
                 try
@@ -234,7 +332,6 @@ namespace SistemaPina
             }
         }
 
-        // Cerrar sesión
         protected void btnCerrarSesion_Click(object sender, EventArgs e)
         {
             Session.Clear();

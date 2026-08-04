@@ -450,3 +450,100 @@ input[type="password"]:focus {
     font-size: 14px;
     color: #2e7d32;
 }
+
+/* Filtros de fecha en reportes */
+.reporte-fechas {
+    display: flex;
+    gap: 20px;
+}
+
+.reporte-fechas .campo-form {
+    flex: 1;
+}
+/* =============================================
+   BOTONES DE ACCIONES (Editar, Recomendar, Eliminar)
+   ============================================= */
+
+/* Botón Editar - AZUL */
+.btn-editar {
+    background-color: #0d6efd; /* Azul primario de Bootstrap */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 4px;
+}
+
+.btn-editar:hover {
+    background-color: #0b5ed7; /* Azul más oscuro al pasar el mouse */
+}
+
+/* Botón Recomendar - VERDE/AZUL */
+.btn-recomendar {
+    background-color: #1565c0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 4px;
+}
+
+.btn-recomendar:hover {
+    background-color: #0d47a1;
+}
+
+/* Botón Eliminar - ROJO */
+.btn-eliminar {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #b71c1c;
+}
+
+/* Botón Guardar - VERDE */
+.btn-guardar {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-guardar:hover {
+    background-color: #1b5e20;
+}
+
+/* Botón Actualizar - en el formulario de edición (cuando se edita) */
+.btn-actualizar {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-actualizar:hover {
+    background-color: #e0a800;
+}

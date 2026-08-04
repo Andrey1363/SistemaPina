@@ -11,7 +11,7 @@ namespace SistemaPina
 {
 
 
-    public partial class Fertilizaciones
+    public partial class Usuarios
     {
 
         /// <summary>
@@ -33,15 +33,6 @@ namespace SistemaPina
         protected global::System.Web.UI.WebControls.Label lblNombreUsuario;
 
         /// <summary>
-        /// Control lblEmpresa.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblEmpresa;
-
-        /// <summary>
         /// Control btnCerrarSesion.
         /// </summary>
         /// <remarks>
@@ -51,94 +42,130 @@ namespace SistemaPina
         protected global::System.Web.UI.WebControls.Button btnCerrarSesion;
 
         /// <summary>
-        /// Control panelUsuarios.
+        /// Control lblDescripcion.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel panelUsuarios;
+        protected global::System.Web.UI.WebControls.Label lblDescripcion;
 
         /// <summary>
-        /// Control ddlFinca.
+        /// Control txtNombreEmpresa.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlFinca;
+        protected global::System.Web.UI.WebControls.TextBox txtNombreEmpresa;
 
         /// <summary>
-        /// Control ddlLote.
+        /// Control txtDescripcionEmpresa.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlLote;
+        protected global::System.Web.UI.WebControls.TextBox txtDescripcionEmpresa;
 
         /// <summary>
-        /// Control btnMarcarTodos.
+        /// Control lblMensajeEmpresa.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnMarcarTodos;
+        protected global::System.Web.UI.WebControls.Label lblMensajeEmpresa;
 
         /// <summary>
-        /// Control btnDesmarcarTodos.
+        /// Control btnGuardarEmpresa.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnDesmarcarTodos;
+        protected global::System.Web.UI.WebControls.Button btnGuardarEmpresa;
 
         /// <summary>
-        /// Control cblBloques.
+        /// Control btnCancelarEdicionEmpresa.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList cblBloques;
+        protected global::System.Web.UI.WebControls.Button btnCancelarEdicionEmpresa;
 
         /// <summary>
-        /// Control ddlCicloPlantacion.
+        /// Control gvEmpresas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCicloPlantacion;
+        protected global::System.Web.UI.WebControls.GridView gvEmpresas;
 
         /// <summary>
-        /// Control txtTipoFertilizante.
+        /// Control lblSubtituloUsuarios.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTipoFertilizante;
+        protected global::System.Web.UI.WebControls.Label lblSubtituloUsuarios;
 
         /// <summary>
-        /// Control txtFechaAplicacion.
+        /// Control ddlEmpresa.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFechaAplicacion;
+        protected global::System.Web.UI.WebControls.DropDownList ddlEmpresa;
 
         /// <summary>
-        /// Control txtObservaciones.
+        /// Control txtNombre.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtObservaciones;
+        protected global::System.Web.UI.WebControls.TextBox txtNombre;
+
+        /// <summary>
+        /// Control txtUsuario.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtUsuario;
+
+        /// <summary>
+        /// Control txtContrasena.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtContrasena;
+
+        /// <summary>
+        /// Control lblContrasenaAyuda.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblContrasenaAyuda;
+
+        /// <summary>
+        /// Control ddlRol.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlRol;
 
         /// <summary>
         /// Control lblMensaje.
@@ -150,93 +177,30 @@ namespace SistemaPina
         protected global::System.Web.UI.WebControls.Label lblMensaje;
 
         /// <summary>
-        /// Control btnGuardarPlantacion.
+        /// Control btnGuardar.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGuardarPlantacion;
+        protected global::System.Web.UI.WebControls.Button btnGuardar;
 
         /// <summary>
-        /// Control gvPlantacion.
+        /// Control btnCancelarEdicion.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvPlantacion;
+        protected global::System.Web.UI.WebControls.Button btnCancelarEdicion;
 
         /// <summary>
-        /// Control ddlGrupoForza.
+        /// Control gvUsuarios.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlGrupoForza;
-
-        /// <summary>
-        /// Control ddlCicloFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCicloFruta;
-
-        /// <summary>
-        /// Control txtTipoFertilizanteFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTipoFertilizanteFruta;
-
-        /// <summary>
-        /// Control txtFechaAplicacionFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFechaAplicacionFruta;
-
-        /// <summary>
-        /// Control txtObservacionesFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtObservacionesFruta;
-
-        /// <summary>
-        /// Control lblMensajeFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMensajeFruta;
-
-        /// <summary>
-        /// Control btnGuardarFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGuardarFruta;
-
-        /// <summary>
-        /// Control gvFruta.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvFruta;
+        protected global::System.Web.UI.WebControls.GridView gvUsuarios;
     }
 }

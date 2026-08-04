@@ -7,6 +7,33 @@ namespace SistemaPina
 {
     public partial class Enfermedades : System.Web.UI.Page
     {
+        // ==========================================
+        // VARIABLES DE ESTADO PARA EDITAR
+        // ==========================================
+        private bool Editando
+        {
+            get { return ViewState["EditandoEnfermedad"] != null && (bool)ViewState["EditandoEnfermedad"]; }
+            set { ViewState["EditandoEnfermedad"] = value; }
+        }
+
+        private string IdEditando
+        {
+            get { return ViewState["IdEnfermedadEditando"] as string; }
+            set { ViewState["IdEnfermedadEditando"] = value; }
+        }
+
+        private bool EditandoRec
+        {
+            get { return ViewState["EditandoRec"] != null && (bool)ViewState["EditandoRec"]; }
+            set { ViewState["EditandoRec"] = value; }
+        }
+
+        private string IdRecEditando
+        {
+            get { return ViewState["IdRecEditando"] as string; }
+            set { ViewState["IdRecEditando"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UsuarioId"] == null)
@@ -14,8 +41,27 @@ namespace SistemaPina
                 Response.Redirect("Login.aspx");
                 return;
             }
+            // SuperAdmin no tiene acceso a este módulo
+            if (Session["Rol"].ToString() == "SuperAdmin")
+            {
+                Response.Redirect("Usuarios.aspx");
+                return;
+            }
 
-            lblNombreUsuario.Text = "👤 " + Session["Nombre"].ToString();
+            // ==========================================
+            // MOSTRAR USUARIO Y EMPRESA
+            // ==========================================
+            lblNombreUsuario.Text = Session["Nombre"].ToString();
+
+            if (Session["NombreEmpresa"] != null && Session["NombreEmpresa"].ToString() != "")
+            {
+                lblEmpresa.Text = Session["NombreEmpresa"].ToString();
+                lblEmpresa.Visible = true;
+            }
+            else
+            {
+                lblEmpresa.Visible = false;
+            }
 
             if (Session["Rol"].ToString() != "Admin")
             {
@@ -30,14 +76,19 @@ namespace SistemaPina
             }
         }
 
+        // ==========================================
+        // CARGAR FINCAS
+        // ==========================================
         private void CargarFincas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
             try
             {
                 conexion.ABRIR_CONEXION();
-                string consulta = "SELECT FincaId, Nombre FROM Fincas ORDER BY Nombre";
+                string consulta = "SELECT FincaId, Nombre FROM Fincas WHERE EmpresaId = @empresaId ORDER BY Nombre";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -56,6 +107,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
+        // ==========================================
+        // CARGAR LOTES
+        // ==========================================
         private void CargarLotes()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -83,6 +137,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
+        // ==========================================
+        // CARGAR BLOQUES
+        // ==========================================
         private void CargarBloques()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -108,6 +165,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
+        // ==========================================
+        // EVENTOS DE CAMBIO EN DROPDOWNS
+        // ==========================================
         protected void ddlFinca_SelectedIndexChanged(object sender, EventArgs e)
         {
             CargarLotes();
@@ -118,7 +178,98 @@ namespace SistemaPina
             CargarBloques();
         }
 
-        // Carga todos los registros de enfermedades con finca, lote y bloques
+        // ==========================================
+        // CARGAR DATOS PARA EDITAR ENFERMEDAD
+        // ==========================================
+        private void CargarEnfermedadParaEditar(string id)
+        {
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+
+                // Obtener datos de la enfermedad
+                string consulta = "SELECT NombreEnfermedad, NivelAfectacion, FechaDeteccion, Observaciones FROM Enfermedades WHERE EnfermedadId = @id";
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@id", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    txtNombreEnfermedad.Text = reader["NombreEnfermedad"].ToString();
+                    ddlNivel.SelectedValue = reader["NivelAfectacion"].ToString();
+                    txtFechaDeteccion.Text = Convert.ToDateTime(reader["FechaDeteccion"]).ToString("yyyy-MM-dd");
+                    txtObservaciones.Text = reader["Observaciones"].ToString();
+                }
+                reader.Close();
+
+                // Marcar los bloques seleccionados
+                string consultaBloques = "SELECT BloqueId FROM EnfermedadBloques WHERE EnfermedadId = @id";
+                MySqlCommand cmdBloques = new MySqlCommand(consultaBloques, conexion.CONECTAR);
+                cmdBloques.Parameters.AddWithValue("@id", id);
+                MySqlDataReader readerBloques = cmdBloques.ExecuteReader();
+
+                while (readerBloques.Read())
+                {
+                    string bloqueId = readerBloques["BloqueId"].ToString();
+                    foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
+                    {
+                        if (item.Value == bloqueId)
+                        {
+                            item.Selected = true;
+                        }
+                    }
+                }
+                readerBloques.Close();
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error al cargar datos: " + ex.Message;
+                lblMensaje.Visible = true;
+            }
+            finally
+            {
+                conexion.CERRAR_CONEXION();
+            }
+        }
+
+        // ==========================================
+        // CARGAR DATOS PARA EDITAR RECOMENDACIÓN
+        // ==========================================
+        private void CargarRecomendacionParaEditar(string id)
+        {
+            CLASS_CONEXION conexion = new CLASS_CONEXION();
+            try
+            {
+                conexion.ABRIR_CONEXION();
+                string consulta = "SELECT Producto, Dosis, FechaAplicacion, Observaciones FROM Recomendaciones WHERE RecomendacionId = @id";
+                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@id", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    txtProductoRec.Text = reader["Producto"].ToString();
+                    txtDosisRec.Text = reader["Dosis"].ToString();
+                    txtFechaRec.Text = Convert.ToDateTime(reader["FechaAplicacion"]).ToString("yyyy-MM-dd");
+                    txtObservacionesRec.Text = reader["Observaciones"].ToString();
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                lblMensajeRec.Text = "Error al cargar datos: " + ex.Message;
+                lblMensajeRec.Visible = true;
+            }
+            finally
+            {
+                conexion.CERRAR_CONEXION();
+            }
+        }
+
+        // ==========================================
+        // CARGAR ENFERMEDADES (SOLO EMPRESA)
+        // ==========================================
         private void CargarEnfermedades()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -126,20 +277,22 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "SELECT e.EnfermedadId, e.NombreEnfermedad, e.NivelAfectacion, " +
-                                  "e.FechaDeteccion, " +
-                                  "f.Nombre AS NombreFinca, " +
-                                  "l.Nombre AS NombreLote, " +
-                                  "GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques " +
-                                  "FROM Enfermedades e " +
-                                  "LEFT JOIN EnfermedadBloques eb ON e.EnfermedadId = eb.EnfermedadId " +
-                                  "LEFT JOIN Bloques b ON eb.BloqueId = b.BloqueId " +
-                                  "LEFT JOIN Lotes l ON b.LoteId = l.LoteId " +
-                                  "LEFT JOIN Fincas f ON l.FincaId = f.FincaId " +
-                                  "GROUP BY e.EnfermedadId, e.NombreEnfermedad, e.NivelAfectacion, e.FechaDeteccion, f.Nombre, l.Nombre " +
-                                  "ORDER BY e.FechaDeteccion DESC";
+                string consulta = @"
+                    SELECT e.EnfermedadId, e.NombreEnfermedad, e.NivelAfectacion, 
+                           e.FechaDeteccion, f.Nombre AS NombreFinca, l.Nombre AS NombreLote, 
+                           GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques
+                    FROM Enfermedades e
+                    LEFT JOIN EnfermedadBloques eb ON e.EnfermedadId = eb.EnfermedadId
+                    LEFT JOIN Bloques b ON eb.BloqueId = b.BloqueId
+                    LEFT JOIN Lotes l ON b.LoteId = l.LoteId
+                    LEFT JOIN Fincas f ON l.FincaId = f.FincaId
+                    WHERE f.EmpresaId = @empresaId
+                    GROUP BY e.EnfermedadId, e.NombreEnfermedad, e.NivelAfectacion, e.FechaDeteccion, f.Nombre, l.Nombre
+                    ORDER BY e.FechaDeteccion DESC";
 
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -149,13 +302,15 @@ namespace SistemaPina
             }
             catch (Exception ex)
             {
-                lblMensaje.Text = "Error: " + ex.Message;
+                lblMensaje.Text = "Error al cargar enfermedades: " + ex.Message;
                 lblMensaje.Visible = true;
             }
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Carga todas las recomendaciones de enfermedades
+        // ==========================================
+        // CARGAR RECOMENDACIONES (SOLO EMPRESA)
+        // ==========================================
         private void CargarRecomendaciones()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
@@ -163,21 +318,26 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "SELECT r.RecomendacionId, e.NombreEnfermedad, " +
-                                  "f.Nombre AS NombreFinca, " +
-                                  "l.Nombre AS NombreLote, " +
-                                  "GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques, " +
-                                  "r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones " +
-                                  "FROM Recomendaciones r " +
-                                  "INNER JOIN Enfermedades e ON r.EnfermedadId = e.EnfermedadId " +
-                                  "LEFT JOIN EnfermedadBloques eb ON e.EnfermedadId = eb.EnfermedadId " +
-                                  "LEFT JOIN Bloques b ON eb.BloqueId = b.BloqueId " +
-                                  "LEFT JOIN Lotes l ON b.LoteId = l.LoteId " +
-                                  "LEFT JOIN Fincas f ON l.FincaId = f.FincaId " +
-                                  "GROUP BY r.RecomendacionId, e.NombreEnfermedad, f.Nombre, l.Nombre, r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones " +
-                                  "ORDER BY r.FechaAplicacion DESC";
+                string consulta = @"
+                    SELECT r.RecomendacionId, e.NombreEnfermedad, 
+                           f.Nombre AS NombreFinca, 
+                           l.Nombre AS NombreLote, 
+                           GROUP_CONCAT(b.Nombre ORDER BY b.Nombre SEPARATOR ', ') AS Bloques, 
+                           r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones
+                    FROM Recomendaciones r
+                    INNER JOIN Enfermedades e ON r.EnfermedadId = e.EnfermedadId
+                    LEFT JOIN EnfermedadBloques eb ON e.EnfermedadId = eb.EnfermedadId
+                    LEFT JOIN Bloques b ON eb.BloqueId = b.BloqueId
+                    LEFT JOIN Lotes l ON b.LoteId = l.LoteId
+                    LEFT JOIN Fincas f ON l.FincaId = f.FincaId
+                    WHERE f.EmpresaId = @empresaId
+                    GROUP BY r.RecomendacionId, e.NombreEnfermedad, f.Nombre, l.Nombre, 
+                             r.Producto, r.Dosis, r.FechaAplicacion, r.Observaciones
+                    ORDER BY r.FechaAplicacion DESC";
 
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
+
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -187,13 +347,15 @@ namespace SistemaPina
             }
             catch (Exception ex)
             {
-                lblMensaje.Text = "Error: " + ex.Message;
+                lblMensaje.Text = "Error al cargar recomendaciones: " + ex.Message;
                 lblMensaje.Visible = true;
             }
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Guarda un nuevo registro de enfermedad con varios bloques
+        // ==========================================
+        // GUARDAR / ACTUALIZAR ENFERMEDAD
+        // ==========================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             string nombre = txtNombreEnfermedad.Text.Trim();
@@ -220,38 +382,85 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "INSERT INTO Enfermedades (NombreEnfermedad, NivelAfectacion, FechaDeteccion, Observaciones) " +
-                                  "VALUES (@nombre, @nivel, @fechaDeteccion, @observaciones)";
-
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@nombre", nombre);
-                cmd.Parameters.AddWithValue("@nivel", nivel);
-                cmd.Parameters.AddWithValue("@fechaDeteccion", fechaDeteccion);
-                cmd.Parameters.AddWithValue("@observaciones", observaciones);
-                cmd.ExecuteNonQuery();
-
-                long enfermedadId = cmd.LastInsertedId;
-
-                foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
+                if (Editando)
                 {
-                    if (item.Selected)
+                    // ==========================================
+                    // ACTUALIZAR ENFERMEDAD
+                    // ==========================================
+                    string consulta = "UPDATE Enfermedades SET NombreEnfermedad = @nombre, NivelAfectacion = @nivel, " +
+                                      "FechaDeteccion = @fechaDeteccion, Observaciones = @observaciones " +
+                                      "WHERE EnfermedadId = @id";
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@nivel", nivel);
+                    cmd.Parameters.AddWithValue("@fechaDeteccion", fechaDeteccion);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.Parameters.AddWithValue("@id", IdEditando);
+                    cmd.ExecuteNonQuery();
+
+                    // Eliminar bloques antiguos
+                    string eliminarBloques = "DELETE FROM EnfermedadBloques WHERE EnfermedadId = @id";
+                    MySqlCommand cmdEliminar = new MySqlCommand(eliminarBloques, conexion.CONECTAR);
+                    cmdEliminar.Parameters.AddWithValue("@id", IdEditando);
+                    cmdEliminar.ExecuteNonQuery();
+
+                    // Insertar bloques seleccionados
+                    foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
                     {
-                        string insertBloque = "INSERT INTO EnfermedadBloques (EnfermedadId, BloqueId) VALUES (@enfermedadId, @bloqueId)";
-                        MySqlCommand cmdBloque = new MySqlCommand(insertBloque, conexion.CONECTAR);
-                        cmdBloque.Parameters.AddWithValue("@enfermedadId", enfermedadId);
-                        cmdBloque.Parameters.AddWithValue("@bloqueId", item.Value);
-                        cmdBloque.ExecuteNonQuery();
+                        if (item.Selected)
+                        {
+                            string insertBloque = "INSERT INTO EnfermedadBloques (EnfermedadId, BloqueId) VALUES (@enfermedadId, @bloqueId)";
+                            MySqlCommand cmdBloque = new MySqlCommand(insertBloque, conexion.CONECTAR);
+                            cmdBloque.Parameters.AddWithValue("@enfermedadId", IdEditando);
+                            cmdBloque.Parameters.AddWithValue("@bloqueId", item.Value);
+                            cmdBloque.ExecuteNonQuery();
+                        }
                     }
+
+                    lblMensaje.Text = "✅ Enfermedad actualizada correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
+
+                    Editando = false;
+                    IdEditando = null;
+                    btnGuardar.Text = "Guardar enfermedad";
+                }
+                else
+                {
+                    // ==========================================
+                    // INSERTAR NUEVA ENFERMEDAD
+                    // ==========================================
+                    string consulta = "INSERT INTO Enfermedades (NombreEnfermedad, NivelAfectacion, FechaDeteccion, Observaciones) " +
+                                      "VALUES (@nombre, @nivel, @fechaDeteccion, @observaciones)";
+
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@nivel", nivel);
+                    cmd.Parameters.AddWithValue("@fechaDeteccion", fechaDeteccion);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.ExecuteNonQuery();
+
+                    long enfermedadId = cmd.LastInsertedId;
+
+                    foreach (System.Web.UI.WebControls.ListItem item in cblBloques.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            string insertBloque = "INSERT INTO EnfermedadBloques (EnfermedadId, BloqueId) VALUES (@enfermedadId, @bloqueId)";
+                            MySqlCommand cmdBloque = new MySqlCommand(insertBloque, conexion.CONECTAR);
+                            cmdBloque.Parameters.AddWithValue("@enfermedadId", enfermedadId);
+                            cmdBloque.Parameters.AddWithValue("@bloqueId", item.Value);
+                            cmdBloque.ExecuteNonQuery();
+                        }
+                    }
+
+                    lblMensaje.Text = "✅ Enfermedad registrada correctamente.";
+                    lblMensaje.CssClass = "mensaje-exito";
                 }
 
                 txtNombreEnfermedad.Text = "";
                 txtFechaDeteccion.Text = "";
                 txtObservaciones.Text = "";
-
-                lblMensaje.Text = "✅ Enfermedad registrada correctamente.";
-                lblMensaje.CssClass = "mensaje-exito";
                 lblMensaje.Visible = true;
-
                 CargarEnfermedades();
             }
             catch (Exception ex)
@@ -263,13 +472,21 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Maneja botones de la tabla
+        // ==========================================
+        // COMANDOS DE TABLA ENFERMEDADES (Recomendar, Editar, Eliminar)
+        // ==========================================
         protected void gvEnfermedades_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            int index = Convert.ToInt32(e.CommandArgument);
-            string enfermedadId = gvEnfermedades.DataKeys[index].Value.ToString();
+            string enfermedadId = e.CommandArgument.ToString();
 
-            if (e.CommandName == "Recomendar")
+            if (e.CommandName == "Editar")
+            {
+                CargarEnfermedadParaEditar(enfermedadId);
+                Editando = true;
+                IdEditando = enfermedadId;
+                btnGuardar.Text = "✅ Actualizar Enfermedad";
+            }
+            else if (e.CommandName == "Recomendar")
             {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
                 try
@@ -338,7 +555,9 @@ namespace SistemaPina
             }
         }
 
-        // Guarda la recomendación de enfermedad
+        // ==========================================
+        // GUARDAR / ACTUALIZAR RECOMENDACIÓN
+        // ==========================================
         protected void btnGuardarRec_Click(object sender, EventArgs e)
         {
             string producto = txtProductoRec.Text.Trim();
@@ -360,23 +579,52 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                string consulta = "INSERT INTO Recomendaciones (EnfermedadId, Producto, Dosis, FechaAplicacion, Observaciones) " +
-                                  "VALUES (@enfermedadId, @producto, @dosis, @fecha, @observaciones)";
+                if (EditandoRec)
+                {
+                    // ==========================================
+                    // ACTUALIZAR RECOMENDACIÓN
+                    // ==========================================
+                    string consulta = "UPDATE Recomendaciones SET Producto = @producto, Dosis = @dosis, " +
+                                      "FechaAplicacion = @fecha, Observaciones = @observaciones " +
+                                      "WHERE RecomendacionId = @id";
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@producto", producto);
+                    cmd.Parameters.AddWithValue("@dosis", dosis);
+                    cmd.Parameters.AddWithValue("@fecha", fecha);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.Parameters.AddWithValue("@id", IdRecEditando);
+                    cmd.ExecuteNonQuery();
 
-                MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@enfermedadId", enfermedadId);
-                cmd.Parameters.AddWithValue("@producto", producto);
-                cmd.Parameters.AddWithValue("@dosis", dosis);
-                cmd.Parameters.AddWithValue("@fecha", fecha);
-                cmd.Parameters.AddWithValue("@observaciones", string.IsNullOrEmpty(observaciones) ? (object)DBNull.Value : observaciones);
-                cmd.ExecuteNonQuery();
+                    lblMensajeRec.Text = "✅ Recomendación actualizada correctamente.";
+                    lblMensajeRec.CssClass = "mensaje-exito";
+
+                    EditandoRec = false;
+                    IdRecEditando = null;
+                    btnGuardarRec.Text = "Guardar recomendación";
+                }
+                else
+                {
+                    // ==========================================
+                    // INSERTAR NUEVA RECOMENDACIÓN
+                    // ==========================================
+                    string consulta = "INSERT INTO Recomendaciones (EnfermedadId, Producto, Dosis, FechaAplicacion, Observaciones) " +
+                                      "VALUES (@enfermedadId, @producto, @dosis, @fecha, @observaciones)";
+
+                    MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
+                    cmd.Parameters.AddWithValue("@enfermedadId", enfermedadId);
+                    cmd.Parameters.AddWithValue("@producto", producto);
+                    cmd.Parameters.AddWithValue("@dosis", dosis);
+                    cmd.Parameters.AddWithValue("@fecha", fecha);
+                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.ExecuteNonQuery();
+
+                    lblMensajeRec.Text = "✅ Recomendación guardada correctamente.";
+                    lblMensajeRec.CssClass = "mensaje-exito";
+                }
 
                 txtProductoRec.Text = "";
                 txtDosisRec.Text = "";
                 txtObservacionesRec.Text = "";
-
-                lblMensajeRec.Text = "✅ Recomendación guardada correctamente.";
-                lblMensajeRec.CssClass = "mensaje-exito";
                 lblMensajeRec.Visible = true;
 
                 panelRecomendacion.Visible = false;
@@ -392,7 +640,9 @@ namespace SistemaPina
             finally { conexion.CERRAR_CONEXION(); }
         }
 
-        // Cancela la recomendación
+        // ==========================================
+        // CANCELAR RECOMENDACIÓN
+        // ==========================================
         protected void btnCancelarRec_Click(object sender, EventArgs e)
         {
             panelRecomendacion.Visible = false;
@@ -401,14 +651,22 @@ namespace SistemaPina
             txtObservacionesRec.Text = "";
         }
 
-        // Elimina una recomendación
+        // ==========================================
+        // COMANDOS DE TABLA RECOMENDACIONES (Editar, Eliminar)
+        // ==========================================
         protected void gvRecomendaciones_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            if (e.CommandName == "Eliminar")
-            {
-                int index = Convert.ToInt32(e.CommandArgument);
-                string recId = gvRecomendaciones.DataKeys[index].Value.ToString();
+            string recId = e.CommandArgument.ToString();
 
+            if (e.CommandName == "EditarRec")
+            {
+                CargarRecomendacionParaEditar(recId);
+                EditandoRec = true;
+                IdRecEditando = recId;
+                btnGuardarRec.Text = "✅ Actualizar Recomendación";
+            }
+            else if (e.CommandName == "Eliminar")
+            {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
                 try
                 {
@@ -434,7 +692,9 @@ namespace SistemaPina
             }
         }
 
-        // Cerrar sesión
+        // ==========================================
+        // CERRAR SESIÓN
+        // ==========================================
         protected void btnCerrarSesion_Click(object sender, EventArgs e)
         {
             Session.Clear();

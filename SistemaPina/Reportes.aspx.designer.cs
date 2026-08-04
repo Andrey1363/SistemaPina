@@ -11,7 +11,7 @@ namespace SistemaPina
 {
 
 
-    public partial class Fertilizaciones
+    public partial class Reportes
     {
 
         /// <summary>
@@ -60,183 +60,183 @@ namespace SistemaPina
         protected global::System.Web.UI.WebControls.Panel panelUsuarios;
 
         /// <summary>
-        /// Control ddlFinca.
+        /// Control ddlFincaPlagas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlFinca;
+        protected global::System.Web.UI.WebControls.DropDownList ddlFincaPlagas;
 
         /// <summary>
-        /// Control ddlLote.
+        /// Control ddlLotePlagas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlLote;
+        protected global::System.Web.UI.WebControls.DropDownList ddlLotePlagas;
 
         /// <summary>
-        /// Control btnMarcarTodos.
+        /// Control txtFechaDesde1.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnMarcarTodos;
+        protected global::System.Web.UI.WebControls.TextBox txtFechaDesde1;
 
         /// <summary>
-        /// Control btnDesmarcarTodos.
+        /// Control txtFechaHasta1.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnDesmarcarTodos;
+        protected global::System.Web.UI.WebControls.TextBox txtFechaHasta1;
 
         /// <summary>
-        /// Control cblBloques.
+        /// Control btnGenerarPlagas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList cblBloques;
+        protected global::System.Web.UI.WebControls.Button btnGenerarPlagas;
 
         /// <summary>
-        /// Control ddlCicloPlantacion.
+        /// Control panelResultadoPlagas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCicloPlantacion;
+        protected global::System.Web.UI.WebControls.Panel panelResultadoPlagas;
 
         /// <summary>
-        /// Control txtTipoFertilizante.
+        /// Control gvReportePlagas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTipoFertilizante;
+        protected global::System.Web.UI.WebControls.GridView gvReportePlagas;
 
         /// <summary>
-        /// Control txtFechaAplicacion.
+        /// Control hfDatosPlagas.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFechaAplicacion;
+        protected global::System.Web.UI.WebControls.HiddenField hfDatosPlagas;
 
         /// <summary>
-        /// Control txtObservaciones.
+        /// Control ddlFincaLabores.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtObservaciones;
+        protected global::System.Web.UI.WebControls.DropDownList ddlFincaLabores;
 
         /// <summary>
-        /// Control lblMensaje.
+        /// Control ddlLoteLabores.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMensaje;
+        protected global::System.Web.UI.WebControls.DropDownList ddlLoteLabores;
 
         /// <summary>
-        /// Control btnGuardarPlantacion.
+        /// Control txtFechaDesde2.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGuardarPlantacion;
+        protected global::System.Web.UI.WebControls.TextBox txtFechaDesde2;
 
         /// <summary>
-        /// Control gvPlantacion.
+        /// Control txtFechaHasta2.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvPlantacion;
+        protected global::System.Web.UI.WebControls.TextBox txtFechaHasta2;
 
         /// <summary>
-        /// Control ddlGrupoForza.
+        /// Control btnGenerarLabores.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlGrupoForza;
+        protected global::System.Web.UI.WebControls.Button btnGenerarLabores;
 
         /// <summary>
-        /// Control ddlCicloFruta.
+        /// Control panelResultadoLabores.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCicloFruta;
+        protected global::System.Web.UI.WebControls.Panel panelResultadoLabores;
 
         /// <summary>
-        /// Control txtTipoFertilizanteFruta.
+        /// Control gvReporteLabores.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTipoFertilizanteFruta;
+        protected global::System.Web.UI.WebControls.GridView gvReporteLabores;
 
         /// <summary>
-        /// Control txtFechaAplicacionFruta.
+        /// Control hfDatosLabores.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFechaAplicacionFruta;
+        protected global::System.Web.UI.WebControls.HiddenField hfDatosLabores;
 
         /// <summary>
-        /// Control txtObservacionesFruta.
+        /// Control ddlFincaRendimiento.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtObservacionesFruta;
+        protected global::System.Web.UI.WebControls.DropDownList ddlFincaRendimiento;
 
         /// <summary>
-        /// Control lblMensajeFruta.
+        /// Control btnGenerarRendimiento.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMensajeFruta;
+        protected global::System.Web.UI.WebControls.Button btnGenerarRendimiento;
 
         /// <summary>
-        /// Control btnGuardarFruta.
+        /// Control panelResultadoRendimiento.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGuardarFruta;
+        protected global::System.Web.UI.WebControls.Panel panelResultadoRendimiento;
 
         /// <summary>
-        /// Control gvFruta.
+        /// Control gvReporteRendimiento.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvFruta;
+        protected global::System.Web.UI.WebControls.GridView gvReporteRendimiento;
     }
 }

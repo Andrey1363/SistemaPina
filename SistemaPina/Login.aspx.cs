@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+﻿
+using System;
 using MySql.Data.MySqlClient;
 using ClassLibrary1;
 
@@ -18,11 +14,11 @@ namespace SistemaPina
 
         protected void btnIngresar_Click(object sender, EventArgs e)
         {
-            
+            // Obtener lo que escribió el usuario
             string usuario = txtUsuario.Text.Trim();
             string contrasena = txtContrasena.Text.Trim();
 
-            
+            // Validar que no estén vacíos
             if (usuario == "" || contrasena == "")
             {
                 lblError.Text = "Por favor completá todos los campos.";
@@ -36,38 +32,60 @@ namespace SistemaPina
             {
                 conexion.ABRIR_CONEXION();
 
-                // Consulta que busca el usuario con esa contraseña encriptada
-                string consulta = "SELECT UsuarioId, Nombre, Rol FROM Usuarios " +
-                                  "WHERE Usuario = @usuario " +
-                                  "AND Contrasena = SHA2(@contrasena, 256) " +
-                                  "AND Activo = 1";
+                // ==========================================
+                // CONSULTA CON NOMBRE DE EMPRESA
+                // ==========================================
+                string consulta = @"
+                    SELECT u.UsuarioId, u.Nombre, u.Rol, u.EmpresaId, 
+                           e.NombreEmpresa 
+                    FROM Usuarios u
+                    LEFT JOIN Empresas e ON u.EmpresaId = e.EmpresaId
+                    WHERE u.Usuario = @usuario 
+                    AND u.Contrasena = SHA2(@contrasena, 256) 
+                    AND u.Activo = 1";
 
-                // Crear el comando con la consulta
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-
-                // Agregar los parámetros
                 cmd.Parameters.AddWithValue("@usuario", usuario);
                 cmd.Parameters.AddWithValue("@contrasena", contrasena);
 
-                // Ejecutar y leer el resultado
                 MySqlDataReader reader = cmd.ExecuteReader();
 
                 if (reader.Read())
                 {
-                    // Usuario encontrado, guardar en Session
+                    // ==========================================
+                    // GUARDAR DATOS EN SESIÓN
+                    // ==========================================
                     Session["UsuarioId"] = reader["UsuarioId"].ToString();
                     Session["Nombre"] = reader["Nombre"].ToString();
                     Session["Rol"] = reader["Rol"].ToString();
 
+                    // Guardar EmpresaId (puede ser NULL para SuperAdmin)
+                    if (reader["EmpresaId"] != DBNull.Value)
+                    {
+                        Session["EmpresaId"] = reader["EmpresaId"].ToString();
+                        Session["NombreEmpresa"] = reader["NombreEmpresa"].ToString();  // 👈 NUEVO
+                    }
+                    else
+                    {
+                        Session["EmpresaId"] = "";
+                        Session["NombreEmpresa"] = "Sin empresa asignada";  // 👈 NUEVO
+                    }
+
                     reader.Close();
                     conexion.CERRAR_CONEXION();
 
-                    // Redirigir al Dashboard
-                    Response.Redirect("Dashboard.aspx");
+                    // Redirigir según el rol
+                    if (Session["Rol"].ToString() == "SuperAdmin")
+                    {
+                        Response.Redirect("Usuarios.aspx");
+                    }
+                    else
+                    {
+                        Response.Redirect("Fincas.aspx");
+                    }
                 }
                 else
                 {
-                    // Usuario no encontrado
                     reader.Close();
                     lblError.Text = "Usuario o contraseña incorrectos.";
                     lblError.Visible = true;

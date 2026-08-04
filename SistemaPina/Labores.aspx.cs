@@ -5,21 +5,21 @@ using System.Data;
 
 namespace SistemaPina
 {
-    public partial class Siembras : System.Web.UI.Page
+    public partial class Labores : System.Web.UI.Page
     {
         // ==========================================
         // VARIABLES DE ESTADO PARA EDITAR
         // ==========================================
         private bool Editando
         {
-            get { return ViewState["EditandoSiembra"] != null && (bool)ViewState["EditandoSiembra"]; }
-            set { ViewState["EditandoSiembra"] = value; }
+            get { return ViewState["EditandoLabor"] != null && (bool)ViewState["EditandoLabor"]; }
+            set { ViewState["EditandoLabor"] = value; }
         }
 
         private string IdEditando
         {
-            get { return ViewState["IdSiembraEditando"] as string; }
-            set { ViewState["IdSiembraEditando"] = value; }
+            get { return ViewState["IdLaborEditando"] as string; }
+            set { ViewState["IdLaborEditando"] = value; }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -59,7 +59,7 @@ namespace SistemaPina
             if (!IsPostBack)
             {
                 CargarFincas();
-                CargarSiembras();
+                CargarLabores();
             }
         }
 
@@ -69,11 +69,9 @@ namespace SistemaPina
         private void CargarFincas()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
-
                 string consulta = "SELECT FincaId, Nombre FROM Fincas WHERE EmpresaId = @empresaId ORDER BY Nombre";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                 cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
@@ -81,13 +79,11 @@ namespace SistemaPina
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-
                 ddlFinca.DataSource = dt;
                 ddlFinca.DataTextField = "Nombre";
                 ddlFinca.DataValueField = "FincaId";
                 ddlFinca.DataBind();
                 ddlFinca.Items.Insert(0, "-- Seleccione una finca --");
-
                 CargarLotes();
             }
             catch (Exception ex)
@@ -95,10 +91,7 @@ namespace SistemaPina
                 lblMensaje.Text = "Error: " + ex.Message;
                 lblMensaje.Visible = true;
             }
-            finally
-            {
-                conexion.CERRAR_CONEXION();
-            }
+            finally { conexion.CERRAR_CONEXION(); }
         }
 
         // ==========================================
@@ -107,25 +100,20 @@ namespace SistemaPina
         private void CargarLotes()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
-
                 string consulta = "SELECT LoteId, Nombre FROM Lotes WHERE FincaId = @fincaId ORDER BY Nombre";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                 cmd.Parameters.AddWithValue("@fincaId", ddlFinca.SelectedValue);
-
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-
                 ddlLote.DataSource = dt;
                 ddlLote.DataTextField = "Nombre";
                 ddlLote.DataValueField = "LoteId";
                 ddlLote.DataBind();
                 ddlLote.Items.Insert(0, "-- Seleccione un lote --");
-
                 CargarBloques();
             }
             catch (Exception ex)
@@ -133,10 +121,7 @@ namespace SistemaPina
                 lblMensaje.Text = "Error: " + ex.Message;
                 lblMensaje.Visible = true;
             }
-            finally
-            {
-                conexion.CERRAR_CONEXION();
-            }
+            finally { conexion.CERRAR_CONEXION(); }
         }
 
         // ==========================================
@@ -145,19 +130,15 @@ namespace SistemaPina
         private void CargarBloques()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
-
                 string consulta = "SELECT BloqueId, Nombre FROM Bloques WHERE LoteId = @loteId ORDER BY Nombre";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                 cmd.Parameters.AddWithValue("@loteId", ddlLote.SelectedValue);
-
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-
                 ddlBloque.DataSource = dt;
                 ddlBloque.DataTextField = "Nombre";
                 ddlBloque.DataValueField = "BloqueId";
@@ -169,16 +150,13 @@ namespace SistemaPina
                 lblMensaje.Text = "Error: " + ex.Message;
                 lblMensaje.Visible = true;
             }
-            finally
-            {
-                conexion.CERRAR_CONEXION();
-            }
+            finally { conexion.CERRAR_CONEXION(); }
         }
 
         // ==========================================
         // CARGAR DATOS PARA EDITAR
         // ==========================================
-        private void CargarSiembraParaEditar(string id)
+        private void CargarLaborParaEditar(string id)
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
             try
@@ -186,61 +164,49 @@ namespace SistemaPina
                 conexion.ABRIR_CONEXION();
 
                 string consulta = @"
-                    SELECT s.BloqueId, s.FechaSiembra, s.CantidadPlantas, s.TipoEtapa, s.Observaciones,
-                           b.LoteId, l.FincaId
-                    FROM Siembras s
-                    INNER JOIN Bloques b ON s.BloqueId = b.BloqueId
-                    INNER JOIN Lotes l ON b.LoteId = l.LoteId
-                    WHERE s.SiembraId = @id";
+                    SELECT l.*, b.LoteId, lo.FincaId 
+                    FROM Labores l 
+                    INNER JOIN Bloques b ON l.BloqueId = b.BloqueId 
+                    INNER JOIN Lotes lo ON b.LoteId = lo.LoteId 
+                    WHERE l.LaborId = @laborId";
 
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@laborId", id);
+                MySqlDataReader reader = cmd.ExecuteReader();
 
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                if (reader.Read())
                 {
-                    if (reader.Read())
+                    string fincaId = reader["FincaId"].ToString();
+                    string loteId = reader["LoteId"].ToString();
+                    string bloqueId = reader["BloqueId"].ToString();
+
+                    // Seleccionar finca
+                    if (ddlFinca.Items.FindByValue(fincaId) != null)
                     {
-                        string fincaId = reader["FincaId"].ToString();
-                        string loteId = reader["LoteId"].ToString();
-                        string bloqueId = reader["BloqueId"].ToString();
-
-                        // Seleccionar finca
-                        if (ddlFinca.Items.FindByValue(fincaId) != null)
-                        {
-                            ddlFinca.SelectedValue = fincaId;
-                        }
-
-                        // Cargar y seleccionar lote
-                        CargarLotes();
-                        if (ddlLote.Items.FindByValue(loteId) != null)
-                        {
-                            ddlLote.SelectedValue = loteId;
-                        }
-
-                        // Cargar y seleccionar bloque
-                        CargarBloques();
-                        if (ddlBloque.Items.FindByValue(bloqueId) != null)
-                        {
-                            ddlBloque.SelectedValue = bloqueId;
-                        }
-
-                        // Cargar el resto de los datos
-                        txtFechaSiembra.Text = Convert.ToDateTime(reader["FechaSiembra"]).ToString("yyyy-MM-dd");
-                        txtCantidadPlantas.Text = reader["CantidadPlantas"].ToString();
-                        txtObservaciones.Text = reader["Observaciones"].ToString();
-
-                        string tipoEtapa = reader["TipoEtapa"].ToString();
-                        if (ddlTipoEtapa.Items.FindByValue(tipoEtapa) != null)
-                        {
-                            ddlTipoEtapa.SelectedValue = tipoEtapa;
-                        }
+                        ddlFinca.SelectedValue = fincaId;
                     }
-                    else
+
+                    // Cargar y seleccionar lote
+                    CargarLotes();
+                    if (ddlLote.Items.FindByValue(loteId) != null)
                     {
-                        lblMensaje.Text = "No se encontró la siembra con ID: " + id;
-                        lblMensaje.Visible = true;
+                        ddlLote.SelectedValue = loteId;
                     }
+
+                    // Cargar y seleccionar bloque
+                    CargarBloques();
+                    if (ddlBloque.Items.FindByValue(bloqueId) != null)
+                    {
+                        ddlBloque.SelectedValue = bloqueId;
+                    }
+
+                    // Cargar el resto de los datos
+                    ddlTipoLabor.SelectedValue = reader["TipoLabor"].ToString();
+                    txtFechaLabor.Text = Convert.ToDateTime(reader["FechaLabor"]).ToString("yyyy-MM-dd");
+                    txtResponsable.Text = reader["Responsable"].ToString();
+                    txtObservaciones.Text = reader["Observaciones"].ToString();
                 }
+                reader.Close();
             }
             catch (Exception ex)
             {
@@ -267,31 +233,30 @@ namespace SistemaPina
         }
 
         // ==========================================
-        // CARGAR SIEMBRAS
+        // CARGAR LABORES
         // ==========================================
-        private void CargarSiembras()
+        private void CargarLabores()
         {
             CLASS_CONEXION conexion = new CLASS_CONEXION();
             try
             {
                 conexion.ABRIR_CONEXION();
-                string consulta = "SELECT s.SiembraId, f.Nombre AS NombreFinca, l.Nombre AS NombreLote, " +
-                                  "b.Nombre AS NombreBloque, s.FechaSiembra, " +
-                                  "DATEDIFF(CURDATE(), s.FechaSiembra) AS EdadDias, " +
-                                  "s.CantidadPlantas, s.TipoEtapa, s.Estado " +
-                                  "FROM Siembras s " +
-                                  "INNER JOIN Bloques b ON s.BloqueId = b.BloqueId " +
-                                  "INNER JOIN Lotes l ON b.LoteId = l.LoteId " +
-                                  "INNER JOIN Fincas f ON l.FincaId = f.FincaId " +
+                string consulta = "SELECT l.LaborId, f.Nombre AS NombreFinca, " +
+                                  "lo.Nombre AS NombreLote, b.Nombre AS NombreBloque, " +
+                                  "l.TipoLabor, l.FechaLabor, l.Responsable, l.Observaciones " +
+                                  "FROM Labores l " +
+                                  "INNER JOIN Bloques b ON l.BloqueId = b.BloqueId " +
+                                  "INNER JOIN Lotes lo ON b.LoteId = lo.LoteId " +
+                                  "INNER JOIN Fincas f ON lo.FincaId = f.FincaId " +
                                   "WHERE f.EmpresaId = @empresaId " +
-                                  "ORDER BY s.FechaSiembra DESC";
+                                  "ORDER BY l.FechaLabor DESC";
                 MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                 cmd.Parameters.AddWithValue("@empresaId", Session["EmpresaId"].ToString());
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-                gvSiembras.DataSource = dt;
-                gvSiembras.DataBind();
+                gvLabores.DataSource = dt;
+                gvLabores.DataBind();
             }
             catch (Exception ex)
             {
@@ -302,26 +267,25 @@ namespace SistemaPina
         }
 
         // ==========================================
-        // GUARDAR / ACTUALIZAR SIEMBRA
+        // GUARDAR / ACTUALIZAR LABOR
         // ==========================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             string bloqueId = ddlBloque.SelectedValue;
-            string fecha = txtFechaSiembra.Text.Trim();
-            string plantas = txtCantidadPlantas.Text.Trim();
-            string etapa = ddlTipoEtapa.SelectedValue;
+            string tipoLabor = ddlTipoLabor.SelectedValue;
+            string fecha = txtFechaLabor.Text.Trim();
+            string responsable = txtResponsable.Text.Trim();
             string observaciones = txtObservaciones.Text.Trim();
 
-            if (bloqueId == "-- Seleccione un bloque --" || fecha == "" || plantas == "")
+            if (bloqueId == "-- Seleccione un bloque --" || fecha == "")
             {
-                lblMensaje.Text = "Bloque, fecha y cantidad de plantas son obligatorios.";
+                lblMensaje.Text = "Bloque y fecha son obligatorios.";
                 lblMensaje.CssClass = "mensaje-error";
                 lblMensaje.Visible = true;
                 return;
             }
 
             CLASS_CONEXION conexion = new CLASS_CONEXION();
-
             try
             {
                 conexion.ABRIR_CONEXION();
@@ -329,52 +293,56 @@ namespace SistemaPina
                 if (Editando)
                 {
                     // ==========================================
-                    // ACTUALIZAR SIEMBRA
+                    // ACTUALIZAR LABOR
                     // ==========================================
-                    string consulta = "UPDATE Siembras SET BloqueId = @bloqueId, FechaSiembra = @fecha, " +
-                                      "CantidadPlantas = @plantas, TipoEtapa = @etapa, Observaciones = @observaciones " +
-                                      "WHERE SiembraId = @id";
+                    string consulta = "UPDATE Labores SET BloqueId = @bloqueId, TipoLabor = @tipoLabor, " +
+                                      "FechaLabor = @fecha, Responsable = @responsable, Observaciones = @observaciones " +
+                                      "WHERE LaborId = @id";
+
                     MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                     cmd.Parameters.AddWithValue("@bloqueId", bloqueId);
+                    cmd.Parameters.AddWithValue("@tipoLabor", tipoLabor);
                     cmd.Parameters.AddWithValue("@fecha", fecha);
-                    cmd.Parameters.AddWithValue("@plantas", plantas);
-                    cmd.Parameters.AddWithValue("@etapa", etapa);
-                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.Parameters.AddWithValue("@responsable", string.IsNullOrEmpty(responsable) ? (object)DBNull.Value : responsable);
+                    cmd.Parameters.AddWithValue("@observaciones", string.IsNullOrEmpty(observaciones) ? (object)DBNull.Value : observaciones);
                     cmd.Parameters.AddWithValue("@id", IdEditando);
                     cmd.ExecuteNonQuery();
 
-                    lblMensaje.Text = "✅ Siembra actualizada correctamente.";
+                    lblMensaje.Text = "✅ Labor actualizada correctamente.";
                     lblMensaje.CssClass = "mensaje-exito";
 
                     Editando = false;
                     IdEditando = null;
-                    btnGuardar.Text = "Guardar siembra";
+                    btnGuardar.Text = "Guardar labor";
+                    btnCancelarEdicion.Visible = false;
+                    lblTituloFormulario.Text = "Registrar labor diaria";
                 }
                 else
                 {
                     // ==========================================
-                    // INSERTAR NUEVA SIEMBRA
+                    // INSERTAR NUEVA LABOR
                     // ==========================================
-                    string consulta = "INSERT INTO Siembras (BloqueId, FechaSiembra, CantidadPlantas, TipoEtapa, Observaciones) " +
-                                      "VALUES (@bloqueId, @fecha, @plantas, @etapa, @observaciones)";
+                    string consulta = "INSERT INTO Labores (BloqueId, TipoLabor, FechaLabor, Responsable, Observaciones) " +
+                                      "VALUES (@bloqueId, @tipoLabor, @fecha, @responsable, @observaciones)";
 
                     MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
                     cmd.Parameters.AddWithValue("@bloqueId", bloqueId);
+                    cmd.Parameters.AddWithValue("@tipoLabor", tipoLabor);
                     cmd.Parameters.AddWithValue("@fecha", fecha);
-                    cmd.Parameters.AddWithValue("@plantas", plantas);
-                    cmd.Parameters.AddWithValue("@etapa", etapa);
-                    cmd.Parameters.AddWithValue("@observaciones", observaciones);
+                    cmd.Parameters.AddWithValue("@responsable", string.IsNullOrEmpty(responsable) ? (object)DBNull.Value : responsable);
+                    cmd.Parameters.AddWithValue("@observaciones", string.IsNullOrEmpty(observaciones) ? (object)DBNull.Value : observaciones);
                     cmd.ExecuteNonQuery();
 
-                    lblMensaje.Text = "✅ Siembra registrada correctamente.";
+                    lblMensaje.Text = "✅ Labor registrada correctamente.";
                     lblMensaje.CssClass = "mensaje-exito";
                 }
 
-                txtFechaSiembra.Text = "";
-                txtCantidadPlantas.Text = "";
+                txtFechaLabor.Text = "";
+                txtResponsable.Text = "";
                 txtObservaciones.Text = "";
                 lblMensaje.Visible = true;
-                CargarSiembras();
+
+                CargarLabores();
             }
             catch (Exception ex)
             {
@@ -382,44 +350,41 @@ namespace SistemaPina
                 lblMensaje.CssClass = "mensaje-error";
                 lblMensaje.Visible = true;
             }
-            finally
-            {
-                conexion.CERRAR_CONEXION();
-            }
+            finally { conexion.CERRAR_CONEXION(); }
         }
 
         // ==========================================
         // ELIMINAR / EDITAR (RowCommand)
         // ==========================================
-        protected void gvSiembras_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+        protected void gvLabores_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
         {
-            string siembraId = e.CommandArgument.ToString();
+            string laborId = e.CommandArgument.ToString();
 
             if (e.CommandName == "Editar")
             {
-                CargarSiembraParaEditar(siembraId);
+                CargarLaborParaEditar(laborId);
                 Editando = true;
-                IdEditando = siembraId;
-                btnGuardar.Text = "✅ Actualizar Siembra";
+                IdEditando = laborId;
+                btnGuardar.Text = "✅ Actualizar Labor";
+                btnCancelarEdicion.Visible = true;
+                lblTituloFormulario.Text = "Editando labor #" + laborId;
             }
             else if (e.CommandName == "Eliminar")
             {
                 CLASS_CONEXION conexion = new CLASS_CONEXION();
-
                 try
                 {
                     conexion.ABRIR_CONEXION();
-
-                    string consulta = "DELETE FROM Siembras WHERE SiembraId = @siembraId";
+                    string consulta = "DELETE FROM Labores WHERE LaborId = @laborId";
                     MySqlCommand cmd = new MySqlCommand(consulta, conexion.CONECTAR);
-                    cmd.Parameters.AddWithValue("@siembraId", siembraId);
+                    cmd.Parameters.AddWithValue("@laborId", laborId);
                     cmd.ExecuteNonQuery();
 
-                    lblMensaje.Text = "✅ Siembra eliminada correctamente.";
+                    lblMensaje.Text = "✅ Labor eliminada correctamente.";
                     lblMensaje.CssClass = "mensaje-exito";
                     lblMensaje.Visible = true;
 
-                    CargarSiembras();
+                    CargarLabores();
                 }
                 catch (Exception ex)
                 {
@@ -427,11 +392,24 @@ namespace SistemaPina
                     lblMensaje.CssClass = "mensaje-error";
                     lblMensaje.Visible = true;
                 }
-                finally
-                {
-                    conexion.CERRAR_CONEXION();
-                }
+                finally { conexion.CERRAR_CONEXION(); }
             }
+        }
+
+        // ==========================================
+        // CANCELAR EDICIÓN
+        // ==========================================
+        protected void btnCancelarEdicion_Click(object sender, EventArgs e)
+        {
+            Editando = false;
+            IdEditando = null;
+            btnGuardar.Text = "Guardar labor";
+            btnCancelarEdicion.Visible = false;
+            lblTituloFormulario.Text = "Registrar labor diaria";
+            txtFechaLabor.Text = "";
+            txtResponsable.Text = "";
+            txtObservaciones.Text = "";
+            lblMensaje.Visible = false;
         }
 
         // ==========================================

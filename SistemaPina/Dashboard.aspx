@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión de Piña</title>
-    <link rel="stylesheet" href="Estilos.less" />
+    <link rel="stylesheet" href="Estilos.css" />
 </head>
 <body>
 
@@ -26,23 +26,31 @@
 
             <!-- Menú lateral izquierdo -->
             <div class="menu-lateral">
-                <ul>
-                    <li><a href="Fincas.aspx"> Fincas</a></li>
-                    <li><a href="Lotes.aspx"> Lotes</a></li>
-                    <li><a href="Bloques.aspx"> Bloques</a></li>
-                    <li><a href="Siembras.aspx"> Siembras</a></li>
-                    <li><a href="Cosechas.aspx"> Cosechas</a></li>
-                    <li><a href="Plagas.aspx"> Plagas</a></li>
-                    <li><a href="Enfermedades.aspx"> Enfermedades</a></li>
-                    <li><a href="Fertilizaciones.aspx"> Fertilizaciones</a></li>
-                    <li><a href="Labores.aspx"> Labores</a></li>
-                    <li><a href="Reportes.aspx"> Reportes</a></li>
-                    <!-- Solo visible para Admin -->
-                    <asp:Panel ID="panelUsuarios" runat="server">
-                        <li><a href="Usuarios.aspx"> Usuarios</a></li>
-                    </asp:Panel>
-                </ul>
-            </div>
+    <ul>
+        <!-- Menú para Admin y Encargado -->
+        <asp:Panel ID="panelMenuNormal" runat="server">
+            <li><a href="Fincas.aspx">Fincas</a></li>
+            <li><a href="Lotes.aspx">Lotes</a></li>
+            <li><a href="Bloques.aspx">Bloques</a></li>
+            <li><a href="Siembras.aspx">Siembras</a></li>
+            <li><a href="GruposForza.aspx">Grupos de Forza</a></li>
+            <li><a href="Cosechas.aspx">Cosechas</a></li>
+            <li><a href="Plagas.aspx">Plagas</a></li>
+            <li><a href="Enfermedades.aspx">Enfermedades</a></li>
+            <li><a href="Fertilizaciones.aspx">Fertilizaciones</a></li>
+            <li><a href="Labores.aspx">Labores</a></li>
+            <li><a href="Reportes.aspx">Reportes</a></li>
+            <asp:Panel ID="panelUsuarios" runat="server">
+                <li><a href="Usuarios.aspx">Usuarios</a></li>
+            </asp:Panel>
+        </asp:Panel>
+
+        <!-- Menú solo para SuperAdmin -->
+        <asp:Panel ID="panelMenuSuperAdmin" runat="server" Visible="false">
+            <li><a href="Usuarios.aspx">Usuarios y Empresas</a></li>
+        </asp:Panel>
+    </ul>
+</div>
 
             
             <div class="contenido">

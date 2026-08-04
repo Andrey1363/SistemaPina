@@ -6,19 +6,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plagas - Sistema de Gestión de Piña</title>
-    <link rel="stylesheet" href="Estilos.less" />
+    <link rel="stylesheet" href="Estilos.css" />
 </head>
 <body>
 
     <form id="form1" runat="server">
 
-        <div class="topbar">
-            <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
-            <div class="topbar-usuario">
-                <asp:Label ID="lblNombreUsuario" runat="server"></asp:Label>
-                <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar sesión" CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+                       <div class="topbar">
+    <div class="topbar-titulo">🍍 Sistema de Gestión de Piña</div>
+    <div class="topbar-usuario">
+        <div class="usuario-info">
+            <div class="usuario-nombre">
+                👤 <asp:Label ID="lblNombreUsuario" runat="server"></asp:Label>
+            </div>
+            <div class="usuario-empresa">
+                🍍 <asp:Label ID="lblEmpresa" runat="server"></asp:Label>
             </div>
         </div>
+        <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar sesión" CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+    </div>
+</div>
 
         <div class="contenedor-principal">
 
@@ -143,18 +150,32 @@
                 <div class="tabla-box">
                     <h3>Registros de plagas</h3>
                         <asp:GridView ID="gvPlagas" runat="server" CssClass="tabla" AutoGenerateColumns="false"
-                                    OnRowCommand="gvPlagas_RowCommand" DataKeyNames="PlagaId">
-                 <Columns>
-                      <asp:BoundField DataField="PlagaId" HeaderText="ID" />
-                      <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
-                      <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
-                      <asp:BoundField DataField="NombrePlaga" HeaderText="Plaga" />
-                      <asp:BoundField DataField="NivelAfectacion" HeaderText="Nivel" />
-                      <asp:BoundField DataField="FechaDeteccion" HeaderText="Detección" DataFormatString="{0:dd/MM/yyyy}" />
-                      <asp:BoundField DataField="Bloques" HeaderText="Bloques afectados" />
-                      <asp:ButtonField ButtonType="Button" CommandName="Recomendar" Text="Recomendar" ControlStyle-CssClass="btn-recomendar" />
-                     <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
-                </Columns>
+                    OnRowCommand="gvPlagas_RowCommand" DataKeyNames="PlagaId">
+                    <Columns>
+                        <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
+                        <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
+                        <asp:BoundField DataField="NombrePlaga" HeaderText="Plaga" />
+                        <asp:BoundField DataField="NivelAfectacion" HeaderText="Nivel" />
+                        <asp:BoundField DataField="FechaDeteccion" HeaderText="Detección" DataFormatString="{0:dd/MM/yyyy}" />
+                        <asp:BoundField DataField="Bloques" HeaderText="Bloques afectados" />
+        
+                        <asp:TemplateField HeaderText="Acciones" ItemStyle-HorizontalAlign="Center">
+                            <ItemTemplate>
+                                <asp:Button ID="btnEditar" runat="server" Text="Editar"
+                                    CommandName="Editar"
+                                    CommandArgument='<%# Eval("PlagaId") %>'
+                                    CssClass="btn-editar" />
+                                <asp:Button ID="btnRecomendar" runat="server" Text="Recomendar"
+                                    CommandName="Recomendar"
+                                    CommandArgument='<%# Eval("PlagaId") %>'
+                                    CssClass="btn-recomendar" />
+                                <asp:Button ID="btnEliminar" runat="server" Text="Eliminar"
+                                    CommandName="Eliminar"
+                                    CommandArgument='<%# Eval("PlagaId") %>'
+                                    CssClass="btn-eliminar" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
                 </asp:GridView>
                 </div>
 
@@ -164,7 +185,6 @@
                      <asp:GridView ID="gvRecomendaciones" runat="server" CssClass="tabla" AutoGenerateColumns="false"
     DataKeyNames="RecomendacionId" OnRowCommand="gvRecomendaciones_RowCommand">
     <Columns>
-        <asp:BoundField DataField="RecomendacionId" HeaderText="ID" />
         <asp:BoundField DataField="NombreFinca" HeaderText="Finca" />
         <asp:BoundField DataField="NombreLote" HeaderText="Lote" />
         <asp:BoundField DataField="NombrePlaga" HeaderText="Plaga" />
@@ -173,9 +193,21 @@
         <asp:BoundField DataField="Dosis" HeaderText="Dosis" />
         <asp:BoundField DataField="FechaAplicacion" HeaderText="Fecha aplicación" DataFormatString="{0:dd/MM/yyyy}" />
         <asp:BoundField DataField="Observaciones" HeaderText="Observaciones" />
-        <asp:ButtonField ButtonType="Button" CommandName="Eliminar" Text="Eliminar" ControlStyle-CssClass="btn-eliminar" />
+        
+        <asp:TemplateField HeaderText="Acciones" ItemStyle-HorizontalAlign="Center">
+            <ItemTemplate>
+                <asp:Button ID="btnEditarRec" runat="server" Text="Editar"
+                    CommandName="EditarRec"
+                    CommandArgument='<%# Eval("RecomendacionId") %>'
+                    CssClass="btn-editar" />
+                <asp:Button ID="btnEliminarRec" runat="server" Text="Eliminar"
+                    CommandName="Eliminar"
+                    CommandArgument='<%# Eval("RecomendacionId") %>'
+                    CssClass="btn-eliminar" />
+            </ItemTemplate>
+        </asp:TemplateField>
     </Columns>
-                    </asp:GridView>
+</asp:GridView>
                 </div>
 
             </div>
